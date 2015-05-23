@@ -11,7 +11,7 @@ license-file:        LICENSE
 author:              Masahiro Sakai
 maintainer:          masahiro.sakai@gmail.com
 -- copyright:           
-category:            Data
+category:            Data, Optimisation, Optimization, Constraints, Logic
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
