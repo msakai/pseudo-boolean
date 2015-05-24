@@ -18,6 +18,18 @@ case_exampleWBO1 = checkWBOString "exampleWBO1" exampleWBO1
 case_exampleWBO2 = checkWBOString "exampleWBO2" exampleWBO2
 case_exampleWBO3 = checkWBOString "exampleWBO3" exampleWBO3
 
+case_exampleLIN_file  = checkOPBFile "test/samples/example-lin.opb"
+case_exampleNLC1_file = checkOPBFile "test/samples/example-nlc-1.opb"
+case_exampleNLC2_file = checkOPBFile "test/samples/example-nlc-2.opb"
+case_exampleWBO1_file = checkWBOFile "test/samples/example1.wbo"
+case_exampleWBO2_file = checkWBOFile "test/samples/example2.wbo"
+case_exampleWBO3_file = checkWBOFile "test/samples/example3.wbo"
+
+case_normalized_1096_cudf_paranoid  = checkOPBFile "test/samples/normalized-1096.cudf.paranoid.opb"
+case_normalized_mds_50_10_4 = checkOPBFile "test/samples/normalized-mds_50_10_4.opb"
+case_normalized_opt_market_split_4_30_2 = checkOPBFile "test/samples/normalized-opt-market-split_4_30_2.opb"
+case_pigeonhole_5_4 = checkOPBFile "test/samples/pigeonhole_5_4.opb"
+
 case_readUnsignedInteger_maxBound_bug :: IO ()
 case_readUnsignedInteger_maxBound_bug =
   readUnsignedInteger "006666666666666667" @?= 6666666666666667
@@ -113,7 +125,11 @@ checkOPBFile fname = do
   r <- parseOPBFile fname
   case r of
     Left err -> assertFailure $ show err
-    Right _  -> return ()
+    Right opb -> do
+      r2 <- A.parseOPBFile fname
+      case r2 of
+        Left err2 -> assertFailure $ show err2
+        Right opb2 -> opb2 @?= opb
 
 checkOPBString :: String -> String -> IO ()
 checkOPBString name str = do
@@ -138,7 +154,11 @@ checkWBOFile fname = do
   r <- parseWBOFile fname
   case r of
     Left err -> assertFailure $ show err
-    Right _  -> return ()
+    Right wbo -> do
+      r2 <- A.parseWBOFile fname
+      case r2 of
+        Left err2 -> assertFailure $ show err2
+        Right wbo2 -> wbo2 @?= wbo
 
 checkWBOString :: String -> String -> IO ()
 checkWBOString name str = do

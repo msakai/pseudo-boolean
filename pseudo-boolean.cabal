@@ -13,7 +13,10 @@ maintainer:          masahiro.sakai@gmail.com
 -- copyright:           
 category:            Data, Optimisation, Optimization, Constraints, Logic
 build-type:          Simple
-extra-source-files:  README.md
+extra-source-files:
+    README.md
+    test/samples/*.opb
+    test/samples/*.wbo
 cabal-version:       >=1.10
 
 source-repository head
