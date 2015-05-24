@@ -3,8 +3,8 @@
 
 name:                pseudo-boolean
 version:             0.1.0.0
-synopsis:            Reading/Writing OPB/WBO files used in pseudo boolean competition
-description:         Reading/Writing OPB/WBO files used in pseudo boolean competition
+synopsis:            Reading\/Writing OPB\/WBO files used in pseudo boolean competition
+description:         Reading\/Writing OPB\/WBO files used in pseudo boolean competition
 homepage:            https://github.com/msakai/pseudo-boolean
 license:             BSD3
 license-file:        LICENSE
