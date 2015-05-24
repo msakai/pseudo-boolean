@@ -11,38 +11,13 @@
 --
 -----------------------------------------------------------------------------
 module Data.PseudoBoolean.Internal.TextUtil
-  ( readInt
-  , readUnsignedInteger
+  ( readUnsignedInteger
   ) where
 
 #include "MachDeps.h"
 
 import Control.Exception
 import Data.Word
-
-{-# INLINABLE readInt #-}
-readInt :: String -> Int
-readInt ('-':str) = - readUnsignedInt str
-readInt str = readUnsignedInt str
-
-{-# INLINABLE readUnsignedInt #-}
-readUnsignedInt :: String -> Int
-readUnsignedInt str = go 0 str
-  where
-    go !r [] = r
-    go !r (c:cs) = go (r*10 + charToInt c) cs
-
-    charToInt :: Char -> Int
-    charToInt '0' = 0
-    charToInt '1' = 1
-    charToInt '2' = 2
-    charToInt '3' = 3
-    charToInt '4' = 4
-    charToInt '5' = 5
-    charToInt '6' = 6
-    charToInt '7' = 7
-    charToInt '8' = 8
-    charToInt '9' = 9
 
 -- | 'read' allocate too many intermediate 'Integer'.
 -- Therefore we use this optimized implementation instead.
