@@ -27,6 +27,11 @@ case_exampleWBO1_file = checkWBOFile "test/samples/example1.wbo"
 case_exampleWBO2_file = checkWBOFile "test/samples/example2.wbo"
 case_exampleWBO3_file = checkWBOFile "test/samples/example3.wbo"
 
+case_exampleLIN_PBS_file = checkOPBFile "test/samples/example-lin-pbs.opb"
+case_exampleLIN_nohint_file = checkOPBFile "test/samples/example-lin-nohint.opb"
+case_exampleWBO1_nohint_file = checkWBOFile "test/samples/example1-nohint.wbo"
+case_exampleWBO1_notop_file = checkWBOFile "test/samples/example1-notop.wbo"
+
 case_normalized_1096_cudf_paranoid  = checkOPBFile "test/samples/normalized-1096.cudf.paranoid.opb"
 case_normalized_mds_50_10_4 = checkOPBFile "test/samples/normalized-mds_50_10_4.opb"
 case_normalized_opt_market_split_4_30_2 = checkOPBFile "test/samples/normalized-opt-market-split_4_30_2.opb"
