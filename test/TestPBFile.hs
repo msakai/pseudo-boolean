@@ -3,6 +3,8 @@
 module Main (main) where
 
 import qualified Data.ByteString.Lazy.Char8 as BSChar8
+import System.IO
+import System.IO.Temp
 import Test.Tasty
 import Test.Tasty.QuickCheck
 import Test.Tasty.HUnit
@@ -130,6 +132,13 @@ checkOPBFile fname = do
       case r2 of
         Left err2 -> assertFailure $ show err2
         Right opb2 -> opb2 @?= opb
+      withSystemTempFile "TestPBFile.opb" $ \tmppath h -> do
+        hClose h
+        writeOPBFile tmppath opb
+        r3 <- parseOPBFile tmppath
+        case r3 of
+          Left err3 -> assertFailure $ show err3
+          Right opb3 -> opb3 @?= opb
 
 checkOPBString :: String -> String -> IO ()
 checkOPBString name str = do
@@ -159,6 +168,13 @@ checkWBOFile fname = do
       case r2 of
         Left err2 -> assertFailure $ show err2
         Right wbo2 -> wbo2 @?= wbo
+      withSystemTempFile "TestPBFile.wbo" $ \tmppath h -> do
+        hClose h
+        writeWBOFile tmppath wbo
+        r3 <- parseWBOFile tmppath
+        case r3 of
+          Left err3 -> assertFailure $ show err3
+          Right wbo3 -> wbo3 @?= wbo
 
 checkWBOString :: String -> String -> IO ()
 checkWBOString name str = do

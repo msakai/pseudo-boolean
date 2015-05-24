@@ -66,6 +66,7 @@ Test-suite TestPBFile
     tasty-quickcheck ==0.8.*,
     tasty-th,
     HUnit,
-    QuickCheck >=2.5 && <3
+    QuickCheck >=2.5 && <3,
+    temporary >=1.2
   Default-Language: Haskell2010
   Other-Extensions: TemplateHaskell
