@@ -16,6 +16,7 @@ build-type:          Simple
 extra-source-files:
     README.md
     test/samples/*.opb
+    test/samples/normalized-1096.cudf.paranoid.opb
     test/samples/*.wbo
 cabal-version:       >=1.10
 
