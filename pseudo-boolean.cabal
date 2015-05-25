@@ -3,7 +3,7 @@
 
 name:                pseudo-boolean
 version:             0.1.1.0
-synopsis:            Reading\/Writing OPB\/WBO files used in pseudo boolean competition
+synopsis:            Reading/Writing OPB/WBO files used in pseudo boolean competition
 description:         Reading\/Writing OPB\/WBO files used in pseudo boolean competition
 homepage:            https://github.com/msakai/pseudo-boolean
 bug-reports:         https://github.com/msakai/pseudo-boolean/issues
