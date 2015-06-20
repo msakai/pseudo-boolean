@@ -35,6 +35,7 @@ module Data.PseudoBoolean.Parsec
   ) where
 
 import Prelude hiding (sum)
+import Control.Applicative ((<*))
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
 import Data.Maybe
@@ -200,15 +201,15 @@ literal = variablename <|> (char '~' >> liftM negate variablename)
 
 -- | Parse a OPB format string containing pseudo boolean problem.
 parseOPBString :: SourceName -> String -> Either ParseError Formula
-parseOPBString = parse formula
+parseOPBString = parse (formula <* eof)
 
 -- | Parse a OPB format lazy bytestring containing pseudo boolean problem.
 parseOPBByteString :: SourceName -> ByteString -> Either ParseError Formula
-parseOPBByteString = parse formula
+parseOPBByteString = parse (formula <* eof)
 
 -- | Parse a OPB file containing pseudo boolean problem.
 parseOPBFile :: FilePath -> IO (Either ParseError Formula)
-parseOPBFile = ParsecBS.parseFromFile formula
+parseOPBFile = ParsecBS.parseFromFile (formula <* eof)
 
 
 -- <softformula>::= <sequence_of_comments> <softheader> <sequence_of_comments_or_constraints>
@@ -262,12 +263,12 @@ softconstraint = do
 
 -- | Parse a WBO format string containing weighted boolean optimization problem.
 parseWBOString :: SourceName -> String -> Either ParseError SoftFormula
-parseWBOString = parse softformula
+parseWBOString = parse (softformula <* eof)
 
 -- | Parse a WBO format lazy bytestring containing pseudo boolean problem.
 parseWBOByteString :: SourceName -> ByteString -> Either ParseError SoftFormula
-parseWBOByteString = parse softformula
+parseWBOByteString = parse (softformula <* eof)
 
 -- | Parse a WBO file containing weighted boolean optimization problem.
 parseWBOFile :: FilePath -> IO (Either ParseError SoftFormula)
-parseWBOFile = ParsecBS.parseFromFile softformula
+parseWBOFile = ParsecBS.parseFromFile (softformula <* eof)

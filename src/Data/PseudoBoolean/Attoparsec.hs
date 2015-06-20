@@ -33,7 +33,7 @@ module Data.PseudoBoolean.Attoparsec
   ) where
 
 import Prelude hiding (sum)
-import Control.Applicative ((<|>))
+import Control.Applicative ((<|>), (<*))
 import Control.Monad
 import Data.Attoparsec.ByteString.Char8 hiding (isDigit)
 import qualified Data.Attoparsec.ByteString.Lazy as L
@@ -201,7 +201,7 @@ literal = variablename <|> (char '~' >> liftM negate variablename)
 
 -- | Parse a OPB format string containing pseudo boolean problem.
 parseOPBByteString :: BSLazy.ByteString -> Either String Formula
-parseOPBByteString s = L.eitherResult $ L.parse formula s
+parseOPBByteString s = L.eitherResult $ L.parse (formula <* endOfInput) s
 
 -- | Parse a OPB file containing pseudo boolean problem.
 parseOPBFile :: FilePath -> IO (Either String Formula)
@@ -260,7 +260,7 @@ softconstraint = do
 
 -- | Parse a WBO format string containing weighted boolean optimization problem.
 parseWBOByteString :: BSLazy.ByteString -> Either String SoftFormula
-parseWBOByteString s = L.eitherResult $ L.parse softformula s
+parseWBOByteString s = L.eitherResult $ L.parse (softformula <* endOfInput) s
 
 -- | Parse a WBO file containing weighted boolean optimization problem.
 parseWBOFile :: FilePath -> IO (Either String SoftFormula)

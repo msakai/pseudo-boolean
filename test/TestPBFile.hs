@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wall #-}
 module Main (main) where
 
+import Data.Either
 import qualified Data.ByteString.Lazy.Char8 as BSChar8
 import System.IO
 import System.IO.Temp
@@ -36,6 +37,25 @@ case_normalized_1096_cudf_paranoid  = checkOPBFile "test/samples/normalized-1096
 case_normalized_mds_50_10_4 = checkOPBFile "test/samples/normalized-mds_50_10_4.opb"
 case_normalized_opt_market_split_4_30_2 = checkOPBFile "test/samples/normalized-opt-market-split_4_30_2.opb"
 case_pigeonhole_5_4 = checkOPBFile "test/samples/pigeonhole_5_4.opb"
+
+case_trailing_junk = do
+  isLeft (parseOPBString "" trailingJunk) @?= True
+  isLeft (parseOPBByteString "" (BSChar8.pack trailingJunk)) @?= True
+  isLeft (A.parseOPBByteString (BSChar8.pack trailingJunk)) @?= True
+  where
+    trailingJunk = unlines
+      [ "* #variable= 5 #constraint= 4"
+      , "*"
+      , "* this is a dummy instance"
+      , "*"
+      , "min: 1 x2 -1 x3 ;"
+      , "1 x1 +4 x2 -2 x5 >= 2;"
+      , "-1 x1 +4 x2 -2 x5 >= +3;"
+      , "12345678901234567890 x4 +4 x3 >= 10;"
+      , "* an equality constraint"
+      , "2 x2 +3 x4 +2 x1 +3 x5 = 5;"
+      , "foo"
+      ]
 
 case_readUnsignedInteger_maxBound_bug :: IO ()
 case_readUnsignedInteger_maxBound_bug =

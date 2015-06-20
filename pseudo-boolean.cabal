@@ -16,6 +16,7 @@ category:            Data, Optimisation, Optimization, Constraints, Logic
 build-type:          Simple
 extra-source-files:
     README.md
+    CHANGELOG.markdown
     test/samples/*.opb
     test/samples/normalized-1096.cudf.paranoid.opb
     test/samples/*.wbo
