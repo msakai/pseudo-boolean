@@ -60,6 +60,7 @@ wboBuilder wbo = size <> part1 <> part2
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
     size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
+         <> fromString (printf " #soft= %d" (wboNumSoft wbo))
          <> fromString "\n"
     part1 = 
       case wboTopCost wbo of

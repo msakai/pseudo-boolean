@@ -66,6 +66,7 @@ wboBuilder wbo = size <> part1 <> part2
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
     size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
          <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
+         <> string7 " #soft= %d" <> intDec (wboNumSoft wbo)
          <> char7 '\n'
     part1 = 
       case wboTopCost wbo of

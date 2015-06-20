@@ -36,6 +36,7 @@ module Data.PseudoBoolean.Types
   , pbProducts
   , wboComputeNumVars
   , wboProducts
+  , wboNumSoft
   ) where
 
 import GHC.Generics (Generic)
@@ -140,3 +141,6 @@ wboProducts softformula = Set.fromList $ do
   let tm2 = IntSet.fromList tm
   guard $ IntSet.size tm2 > 1
   return tm2
+
+wboNumSoft :: SoftFormula -> Int
+wboNumSoft softformula = length [() | (Just _, _) <- wboConstraints softformula]
