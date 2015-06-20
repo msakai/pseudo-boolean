@@ -21,8 +21,11 @@ module Data.PseudoBoolean.Builder
   , toWBOString
   ) where
 
+import qualified Prelude
 import Prelude hiding (sum)
 import qualified Data.DList as DList
+import qualified Data.IntSet as IntSet
+import qualified Data.Set as Set
 import Data.Monoid hiding (Sum (..))
 import Data.String
 import Text.Printf
@@ -34,7 +37,12 @@ opbBuilder opb = (size <> part1 <> part2)
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
-    size = fromString (printf "* #variable= %d #constraint= %d\n" nv nc)
+    p = pbProducts opb
+    np = Set.size p
+    sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
+    size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
+         <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
+         <> fromString "\n"
     part1 = 
       case pbObjectiveFunction opb of
         Nothing -> mempty
@@ -47,7 +55,12 @@ wboBuilder wbo = size <> part1 <> part2
   where
     nv = wboNumVars wbo
     nc = wboNumConstraints wbo
-    size = fromString (printf "* #variable= %d #constraint= %d\n" nv nc)
+    p = wboProducts wbo
+    np = Set.size p
+    sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
+    size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
+         <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
+         <> fromString "\n"
     part1 = 
       case wboTopCost wbo of
         Nothing -> fromString "soft: ;\n"

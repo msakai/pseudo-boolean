@@ -27,7 +27,10 @@ module Data.PseudoBoolean.ByteStringBuilder
   , hPutWBO
   ) where
 
+import qualified Prelude
 import Prelude hiding (sum)
+import qualified Data.IntSet as IntSet
+import qualified Data.Set as Set
 import Data.Monoid hiding (Sum (..))
 import qualified Data.ByteString.Lazy as BS
 import Data.ByteString.Builder (Builder, intDec, integerDec, char7, string7, hPutBuilder, toLazyByteString)
@@ -40,7 +43,12 @@ opbBuilder opb = (size <> part1 <> part2)
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
-    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc <> char7 '\n'
+    p = pbProducts opb
+    np = Set.size p
+    sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
+    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
+         <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
+         <> char7 '\n'
     part1 = 
       case pbObjectiveFunction opb of
         Nothing -> mempty
@@ -53,7 +61,12 @@ wboBuilder wbo = size <> part1 <> part2
   where
     nv = wboNumVars wbo
     nc = wboNumConstraints wbo
-    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc <> char7 '\n'
+    p = wboProducts wbo
+    np = Set.size p
+    sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
+    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
+         <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
+         <> char7 '\n'
     part1 = 
       case wboTopCost wbo of
         Nothing -> string7 "soft: ;\n"

@@ -33,12 +33,19 @@ module Data.PseudoBoolean.Types
 
   -- * Internal utilities
   , pbComputeNumVars
+  , pbProducts
   , wboComputeNumVars
+  , wboProducts
   ) where
 
 import GHC.Generics (Generic)
+import Control.Monad
 import Control.DeepSeq
 import Data.Data
+import Data.Set (Set)
+import qualified Data.Set as Set
+import Data.IntSet (IntSet)
+import qualified Data.IntSet as IntSet
 import Data.Hashable
 import Data.Maybe
 
@@ -117,3 +124,19 @@ wboComputeNumVars cs = maximum (0 : vs)
       (_, tm) <- s
       lit <- tm
       return $ abs lit
+
+pbProducts :: Formula -> Set IntSet
+pbProducts formula = Set.fromList $ do  
+  s <- maybeToList (pbObjectiveFunction formula) ++ [s | (s,_,_) <- pbConstraints formula]
+  (_, tm)  <- s
+  let tm2 = IntSet.fromList tm
+  guard $ IntSet.size tm2 > 1
+  return tm2
+
+wboProducts :: SoftFormula -> Set IntSet
+wboProducts softformula = Set.fromList $ do
+  (_,(s,_,_)) <- wboConstraints softformula
+  (_, tm) <- s
+  let tm2 = IntSet.fromList tm
+  guard $ IntSet.size tm2 > 1
+  return tm2
