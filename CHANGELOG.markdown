@@ -2,3 +2,4 @@
 -------
 * parse* functions fails if the parser does not consume all of the inputs
 * generate '#product=', 'sizeproduct=' and '#soft=' in header line of OPB/WBO files
+* sort literals in a non-linear term when generating OPB/WBO files

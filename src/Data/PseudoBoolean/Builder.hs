@@ -26,7 +26,9 @@ import Prelude hiding (sum)
 import qualified Data.DList as DList
 import qualified Data.IntSet as IntSet
 import qualified Data.Set as Set
+import Data.List (sortBy)
 import Data.Monoid hiding (Sum (..))
+import Data.Ord
 import Data.String
 import Text.Printf
 import Data.PseudoBoolean.Types
@@ -75,7 +77,7 @@ showWeightedTerm :: (Monoid a, IsString a) => WeightedTerm -> a
 showWeightedTerm (c, lits) = foldr (\f g -> f <> fromString " " <> g) mempty (x:xs)
   where
     x = if c >= 0 then fromString "+" <> fromString (show c) else fromString (show c)
-    xs = map showLit lits
+    xs = map showLit $ sortBy (comparing abs) lits
 
 showLit :: (Monoid a, IsString a) => Lit -> a
 showLit lit = if lit > 0 then v else fromString "~" <> v

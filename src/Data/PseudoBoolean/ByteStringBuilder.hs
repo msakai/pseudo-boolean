@@ -31,9 +31,11 @@ import qualified Prelude
 import Prelude hiding (sum)
 import qualified Data.IntSet as IntSet
 import qualified Data.Set as Set
+import Data.List (sortBy)
 import Data.Monoid hiding (Sum (..))
 import qualified Data.ByteString.Lazy as BS
 import Data.ByteString.Builder (Builder, intDec, integerDec, char7, string7, hPutBuilder, toLazyByteString)
+import Data.Ord
 import System.IO
 import Data.PseudoBoolean.Types
 
@@ -81,7 +83,7 @@ showWeightedTerm :: WeightedTerm -> Builder
 showWeightedTerm (c, lits) = foldr (\f g -> f <> char7 ' ' <> g) mempty (x:xs)
   where
     x = if c >= 0 then char7 '+' <> integerDec c else integerDec c
-    xs = map showLit lits
+    xs = map showLit $ sortBy (comparing abs) lits
 
 showLit :: Lit -> Builder
 showLit lit = if lit > 0 then v else char7 '~' <> v
