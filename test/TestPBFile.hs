@@ -39,10 +39,15 @@ case_normalized_opt_market_split_4_30_2 = checkOPBFile "test/samples/normalized-
 case_pigeonhole_5_4 = checkOPBFile "test/samples/pigeonhole_5_4.opb"
 
 case_trailing_junk = do
-  isLeft (parseOPBString "" trailingJunk) @?= True
-  isLeft (parseOPBByteString "" (BSChar8.pack trailingJunk)) @?= True
-  isLeft (A.parseOPBByteString (BSChar8.pack trailingJunk)) @?= True
+  isError (parseOPBString "" trailingJunk) @?= True
+  isError (parseOPBByteString "" (BSChar8.pack trailingJunk)) @?= True
+  isError (A.parseOPBByteString (BSChar8.pack trailingJunk)) @?= True
   where
+    -- isLeft is available only on base >=4.7.0.0.
+    isError :: Either a b -> Bool
+    isError (Left _) = True
+    isError (Right _) = False
+    
     trailingJunk = unlines
       [ "* #variable= 5 #constraint= 4"
       , "*"
