@@ -109,8 +109,7 @@ objective = do
   _ <- string "min:"
   zeroOrMoreSpace
   obj <- sum
-  _ <- char ';'
-  eol
+  semi
   return obj
 
 -- <constraint>::= <sum> <relational_operator> <zeroOrMoreSpace> <integer> <zeroOrMoreSpace> ";"
