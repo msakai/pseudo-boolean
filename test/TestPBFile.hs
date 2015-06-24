@@ -62,6 +62,83 @@ case_trailing_junk = do
       , "foo"
       ]
 
+case_empty_constraints = do
+  isOk (parseOPBString "" opb) @?= True
+  isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
+  where
+    -- isRight is available only on base >=4.7.0.0.
+    isOk :: Either a b -> Bool
+    isOk (Left _) = False
+    isOk (Right _) = True
+    
+    opb = unlines
+      [ "* #variable= 3 #constraint= 0"
+      , "min: 1 x2 -1 x3 ;"
+      ]
+
+case_wbo_empty_constraints = do
+  isOk (parseWBOString "" wbo) @?= True
+  isOk (parseWBOByteString "" (BSChar8.pack wbo)) @?= True
+  isOk (A.parseWBOByteString (BSChar8.pack wbo)) @?= True
+  where
+    -- isRight is available only on base >=4.7.0.0.
+    isOk :: Either a b -> Bool
+    isOk (Left _) = False
+    isOk (Right _) = True
+    
+    wbo = unlines
+      [ "* #variable= 0 #constraint= 0"
+      , "soft: 1 ;"
+      ]
+
+case_trailing_spaces = do
+  isOk (parseOPBString "" opb) @?= True
+  isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
+  where
+    -- isRight is available only on base >=4.7.0.0.
+    isOk :: Either a b -> Bool
+    isOk (Left _) = False
+    isOk (Right _) = True
+    
+    opb = unlines
+      [ "* #variable= 5 #constraint= 4"
+      , "*"
+      , "* this is a dummy instance"
+      , "*"
+      , "min: 1 x2 -1 x3 ;"
+      , "1 x1 +4 x2 -2 x5 >= 2;"
+      , "-1 x1 +4 x2 -2 x5 >= +3;"
+      , "12345678901234567890 x4 +4 x3 >= 10;"
+      , "* an equality constraint"
+      , "2 x2 +3 x4 +2 x1 +3 x5 = 5;"
+      , "        "
+      ]
+
+case_leading_spaces = do
+  isOk (parseOPBString "" opb) @?= True
+  isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
+  where
+    -- isRight is available only on base >=4.7.0.0.
+    isOk :: Either a b -> Bool
+    isOk (Left _) = False
+    isOk (Right _) = True
+    
+    opb = unlines
+      [ "* #variable= 5 #constraint= 4"
+      , "*"
+      , "* this is a dummy instance"
+      , "*"
+      , "min: 1 x2 -1 x3 ;"
+      , "   1 x1 +4 x2 -2 x5 >= 2;"
+      , "   -1 x1 +4 x2 -2 x5 >= +3;"
+      , "   12345678901234567890 x4 +4 x3 >= 10;"
+      , "* an equality constraint"
+      , "   2 x2 +3 x4 +2 x1 +3 x5 = 5;"
+      ]
+
 case_readUnsignedInteger_maxBound_bug :: IO ()
 case_readUnsignedInteger_maxBound_bug =
   readUnsignedInteger "006666666666666667" @?= 6666666666666667

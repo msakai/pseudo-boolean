@@ -90,12 +90,13 @@ comment :: Stream s m Char => ParsecT s u m ()
 comment = do
   _ <- char '*' 
   _ <- manyTill anyChar eol
+  spaces -- We relax the grammer and allow spaces in the beggining of next component.
   return ()
 
 -- <sequence_of_comments_or_constraints>::= <comment_or_constraint> [<sequence_of_comments_or_constraints>]
 sequence_of_comments_or_constraints :: Stream s m Char => ParsecT s u m [Constraint]
 sequence_of_comments_or_constraints = do
-  xs <- many1 comment_or_constraint
+  xs <- many comment_or_constraint -- We relax the grammer and allow spaces in the beginning of next component.
   return $ catMaybes xs
 
 -- <comment_or_constraint>::= <comment>|<constraint>
@@ -173,7 +174,8 @@ eol :: Stream s m Char => ParsecT s u m ()
 eol = char '\n' >> return ()
 
 semi :: Stream s m Char => ParsecT s u m ()
-semi = char ';' >> eol
+semi = char ';' >> spaces
+-- We relax the grammer and allow spaces in the beginning of next component.
 
 {-
 For linear pseudo-Boolean instances, <term> is defined as
@@ -239,7 +241,7 @@ softheader = do
 -- <sequence_of_comments_or_constraints>::= <comment_or_constraint> [<sequence_of_comments_or_constraints>]
 wbo_sequence_of_comments_or_constraints :: Stream s m Char => ParsecT s u m [SoftConstraint]
 wbo_sequence_of_comments_or_constraints = do
-  xs <- many1 wbo_comment_or_constraint
+  xs <- many wbo_comment_or_constraint -- XXX: we relax the grammer to allow empty sequence
   return $ catMaybes xs
 
 -- <comment_or_constraint>::= <comment>|<constraint>|<softconstraint>

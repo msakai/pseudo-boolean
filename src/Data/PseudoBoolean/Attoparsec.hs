@@ -90,12 +90,13 @@ comment :: Parser ()
 comment = do
   _ <- char '*' 
   _ <- manyTill anyChar eol
+  skipMany space -- We relax the grammer and allow spaces in the beggining of next component.
   return ()
 
 -- <sequence_of_comments_or_constraints>::= <comment_or_constraint> [<sequence_of_comments_or_constraints>]
 sequence_of_comments_or_constraints :: Parser [Constraint]
 sequence_of_comments_or_constraints = do
-  xs <- many1 comment_or_constraint
+  xs <- many' comment_or_constraint -- XXX: we relax the grammer to allow empty sequence
   return $ catMaybes xs
 
 -- <comment_or_constraint>::= <comment>|<constraint>
@@ -173,7 +174,8 @@ eol :: Parser ()
 eol = char '\n' >> return ()
 
 semi :: Parser ()
-semi = char ';' >> eol
+semi = char ';' >> skipMany space
+-- We relax the grammer and allow spaces in the beginning of next component.
 
 {-
 For linear pseudo-Boolean instances, <term> is defined as
@@ -236,7 +238,7 @@ softheader = do
 -- <sequence_of_comments_or_constraints>::= <comment_or_constraint> [<sequence_of_comments_or_constraints>]
 wbo_sequence_of_comments_or_constraints :: Parser [SoftConstraint]
 wbo_sequence_of_comments_or_constraints = do
-  xs <- many1 wbo_comment_or_constraint
+  xs <- many' wbo_comment_or_constraint -- We relax the grammer and allow spaces in the beginning of next component.
   return $ catMaybes xs
 
 -- <comment_or_constraint>::= <comment>|<constraint>|<softconstraint>
