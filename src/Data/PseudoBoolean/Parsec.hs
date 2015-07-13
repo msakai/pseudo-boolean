@@ -168,7 +168,9 @@ oneOrMoreSpace  = skipMany1 (char ' ')
 
 -- <zeroOrMoreSpace>::= [" " <zeroOrMoreSpace>]
 zeroOrMoreSpace :: Stream s m Char => ParsecT s u m ()
-zeroOrMoreSpace = skipMany (char ' ')
+-- zeroOrMoreSpace = skipMany (char ' ')
+zeroOrMoreSpace = spaces
+-- We relax the grammer and allow more type of spacing
 
 eol :: Stream s m Char => ParsecT s u m ()
 eol = char '\n' >> return ()

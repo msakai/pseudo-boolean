@@ -168,13 +168,15 @@ oneOrMoreSpace  = skipMany1 (char ' ')
 
 -- <zeroOrMoreSpace>::= [" " <zeroOrMoreSpace>]
 zeroOrMoreSpace :: Parser ()
-zeroOrMoreSpace = skipMany (char ' ')
+-- zeroOrMoreSpace = skipMany (char ' ')
+zeroOrMoreSpace = skipSpace
+-- We relax the grammer and allow more type of spacing
 
 eol :: Parser ()
 eol = char '\n' >> return ()
 
 semi :: Parser ()
-semi = char ';' >> skipMany space
+semi = char ';' >> skipSpace
 -- We relax the grammer and allow spaces in the beginning of next component.
 
 {-

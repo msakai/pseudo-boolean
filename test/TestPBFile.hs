@@ -62,6 +62,30 @@ case_trailing_junk = do
       , "foo"
       ]
 
+case_min_eol = do
+  isOk (parseOPBString "" opb) @?= True
+  isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
+  where
+    -- isLeft is available only on base >=4.7.0.0.
+    isOk :: Either a b -> Bool
+    isOk (Left _) = False
+    isOk (Right _) = True
+    
+    opb = unlines
+      [ "* #variable= 5 #constraint= 4"
+      , "*"
+      , "* this is a dummy instance"
+      , "*"
+      , "min: "
+      , "1 x2 -1 x3 ;"
+      , "1 x1 +4 x2 -2 x5 >= 2;"
+      , "-1 x1 +4 x2 -2 x5 >= +3;"
+      , "12345678901234567890 x4 +4 x3 >= 10;"
+      , "* an equality constraint"
+      , "2 x2 +3 x4 +2 x1 +3 x5 = 5;"
+      ]
+
 case_empty_constraints = do
   isOk (parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
@@ -92,7 +116,30 @@ case_wbo_empty_constraints = do
       , "soft: 1 ;"
       ]
 
-case_trailing_spaces = do
+case_trailing_spaces_before_eol = do
+  isOk (parseOPBString "" opb) @?= True
+  isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
+  where
+    -- isRight is available only on base >=4.7.0.0.
+    isOk :: Either a b -> Bool
+    isOk (Left _) = False
+    isOk (Right _) = True
+    
+    opb = unlines
+      [ "* #variable= 5 #constraint= 4"
+      , "*"
+      , "* this is a dummy instance"
+      , "*"
+      , "min: 1 x2 -1 x3 ;"
+      , "1 x1 +4 x2 -2 x5 >= 2; "
+      , "-1 x1 +4 x2 -2 x5 >= +3; "
+      , "12345678901234567890 x4 +4 x3 >= 10; "
+      , "* an equality constraint "
+      , "2 x2 +3 x4 +2 x1 +3 x5 = 5; "
+      ]
+
+case_trailing_spaces_before_eof = do
   isOk (parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
   isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
