@@ -1,3 +1,7 @@
+0.1.2.0
+-------
+* relax the grammer of OPB/WBO files to allow various use of space characters.
+
 0.1.1.0
 -------
 * parse* functions fails if the parser does not consume all of the inputs
