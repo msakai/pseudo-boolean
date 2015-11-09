@@ -134,7 +134,7 @@ weightedterm = do
   w <- integer
   oneOrMoreSpace
   t <- term
-  oneOrMoreSpace
+  zeroOrMoreSpace -- we relax the grammar to allow omitting spaces at the end of <sum>.
   return (w,t)
 
 -- <integer>::= <unsigned_integer> | "+" <unsigned_integer> | "-" <unsigned_integer>
