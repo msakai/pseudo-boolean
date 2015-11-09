@@ -1,3 +1,7 @@
+0.1.3.0
+-------
+* relax the grammer of OPB/WBO files to allow ommitng spaces at the end of weighted terms.
+
 0.1.2.0
 -------
 * relax the grammer of OPB/WBO files to allow various use of space characters.
