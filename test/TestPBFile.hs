@@ -12,6 +12,7 @@ import Test.Tasty.HUnit
 import Test.Tasty.TH
 import Data.PseudoBoolean
 import qualified Data.PseudoBoolean.Attoparsec as A
+import qualified Data.PseudoBoolean.Megaparsec as M
 import Data.PseudoBoolean.Internal.TextUtil
 
 case_exampleLIN  = checkOPBString "exampleLIN"  exampleLIN
@@ -42,7 +43,9 @@ case_pigeonhole_5_4 = checkOPBFile "test/samples/pigeonhole_5_4.opb"
 
 case_trailing_junk = do
   isError (parseOPBString "" trailingJunk) @?= True
+  isError (M.parseOPBString "" trailingJunk) @?= True
   isError (parseOPBByteString "" (BSChar8.pack trailingJunk)) @?= True
+  isError (M.parseOPBByteString "" (BSChar8.pack trailingJunk)) @?= True
   isError (A.parseOPBByteString (BSChar8.pack trailingJunk)) @?= True
   where
     -- isLeft is available only on base >=4.7.0.0.
@@ -66,7 +69,9 @@ case_trailing_junk = do
 
 case_min_eol = do
   isOk (parseOPBString "" opb) @?= True
+  isOk (M.parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (M.parseOPBByteString "" (BSChar8.pack opb)) @?= True
   isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
   where
     -- isLeft is available only on base >=4.7.0.0.
@@ -90,7 +95,9 @@ case_min_eol = do
 
 case_empty_constraints = do
   isOk (parseOPBString "" opb) @?= True
+  isOk (M.parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (M.parseOPBByteString "" (BSChar8.pack opb)) @?= True
   isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
   where
     -- isRight is available only on base >=4.7.0.0.
@@ -105,7 +112,9 @@ case_empty_constraints = do
 
 case_wbo_empty_constraints = do
   isOk (parseWBOString "" wbo) @?= True
+  isOk (M.parseWBOString "" wbo) @?= True
   isOk (parseWBOByteString "" (BSChar8.pack wbo)) @?= True
+  isOk (M.parseWBOByteString "" (BSChar8.pack wbo)) @?= True
   isOk (A.parseWBOByteString (BSChar8.pack wbo)) @?= True
   where
     -- isRight is available only on base >=4.7.0.0.
@@ -120,7 +129,9 @@ case_wbo_empty_constraints = do
 
 case_trailing_spaces_before_eol = do
   isOk (parseOPBString "" opb) @?= True
+  isOk (M.parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (M.parseOPBByteString "" (BSChar8.pack opb)) @?= True
   isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
   where
     -- isRight is available only on base >=4.7.0.0.
@@ -143,7 +154,9 @@ case_trailing_spaces_before_eol = do
 
 case_trailing_spaces_before_eof = do
   isOk (parseOPBString "" opb) @?= True
+  isOk (M.parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (M.parseOPBByteString "" (BSChar8.pack opb)) @?= True
   isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
   where
     -- isRight is available only on base >=4.7.0.0.
@@ -167,7 +180,9 @@ case_trailing_spaces_before_eof = do
 
 case_leading_spaces = do
   isOk (parseOPBString "" opb) @?= True
+  isOk (M.parseOPBString "" opb) @?= True
   isOk (parseOPBByteString "" (BSChar8.pack opb)) @?= True
+  isOk (M.parseOPBByteString "" (BSChar8.pack opb)) @?= True
   isOk (A.parseOPBByteString (BSChar8.pack opb)) @?= True
   where
     -- isRight is available only on base >=4.7.0.0.
@@ -284,17 +299,22 @@ checkOPBFile fname = do
   case r of
     Left err -> assertFailure $ show err
     Right opb -> do
-      r2 <- A.parseOPBFile fname
+      r2 <- M.parseOPBFile fname
       case r2 of
         Left err2 -> assertFailure $ show err2
         Right opb2 -> opb2 @?= opb
+      r3 <- A.parseOPBFile fname
+      case r3 of
+        Left err2 -> assertFailure $ show err2
+        Right opb2 -> opb2 @?= opb
+
       withSystemTempFile "TestPBFile.opb" $ \tmppath h -> do
         hClose h
         writeOPBFile tmppath opb
-        r3 <- parseOPBFile tmppath
-        case r3 of
-          Left err3 -> assertFailure $ show err3
-          Right opb3 -> opb3 @?= opb
+        r4 <- parseOPBFile tmppath
+        case r4 of
+          Left err2 -> assertFailure $ show err2
+          Right opb2 -> opb2 @?= opb
 
 checkOPBString :: String -> String -> IO ()
 checkOPBString name str = do
@@ -304,12 +324,21 @@ checkOPBString name str = do
       let s = toOPBString opb
           bs = toOPBByteString opb
       BSChar8.unpack bs @?= s
+
       case parseOPBString name s of
         Left err -> assertFailure $ show err
         Right opb2 -> opb2 @?= opb
       case parseOPBByteString name bs of
         Left err -> assertFailure $ show err
         Right opb2 -> opb2 @?= opb
+
+      case M.parseOPBString name s of
+        Left err -> assertFailure $ show err
+        Right opb2 -> opb2 @?= opb
+      case M.parseOPBByteString name bs of
+        Left err -> assertFailure $ show err
+        Right opb2 -> opb2 @?= opb
+
       case A.parseOPBByteString bs of
         Left err -> assertFailure err
         Right opb2 -> opb2 @?= opb
@@ -320,17 +349,22 @@ checkWBOFile fname = do
   case r of
     Left err -> assertFailure $ show err
     Right wbo -> do
-      r2 <- A.parseWBOFile fname
+      r2 <- M.parseWBOFile fname
       case r2 of
         Left err2 -> assertFailure $ show err2
         Right wbo2 -> wbo2 @?= wbo
+      r3 <- A.parseWBOFile fname
+      case r3 of
+        Left err2 -> assertFailure $ show err2
+        Right wbo2 -> wbo2 @?= wbo
+
       withSystemTempFile "TestPBFile.wbo" $ \tmppath h -> do
         hClose h
         writeWBOFile tmppath wbo
-        r3 <- parseWBOFile tmppath
-        case r3 of
-          Left err3 -> assertFailure $ show err3
-          Right wbo3 -> wbo3 @?= wbo
+        r4 <- parseWBOFile tmppath
+        case r4 of
+          Left err2 -> assertFailure $ show err2
+          Right wbo2 -> wbo2 @?= wbo
 
 checkWBOString :: String -> String -> IO ()
 checkWBOString name str = do
@@ -340,12 +374,21 @@ checkWBOString name str = do
       let s = toWBOString wbo
           bs = toWBOByteString wbo
       BSChar8.unpack bs @?= s
+
       case parseWBOString name s of
         Left err -> assertFailure $ show err
         Right wbo2 -> wbo2 @?= wbo
       case parseWBOByteString name bs of
         Left err -> assertFailure $ show err
         Right wbo2 -> wbo2 @?= wbo
+
+      case M.parseWBOString name s of
+        Left err -> assertFailure $ show err
+        Right wbo2 -> wbo2 @?= wbo
+      case M.parseWBOByteString name bs of
+        Left err -> assertFailure $ show err
+        Right wbo2 -> wbo2 @?= wbo
+
       case A.parseWBOByteString bs of
         Left err -> assertFailure err
         Right wbo2 -> wbo2 @?= wbo

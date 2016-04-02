@@ -32,6 +32,7 @@ library
      Data.PseudoBoolean.Builder
      Data.PseudoBoolean.ByteStringBuilder
      Data.PseudoBoolean.Parsec
+     Data.PseudoBoolean.Megaparsec
      Data.PseudoBoolean.Attoparsec
      Data.PseudoBoolean.Internal.TextUtil
   other-modules:
@@ -47,6 +48,7 @@ library
      base >=4.6.0.1 && <4.9,
      containers >=0.4.2.1,
      parsec >=3.1.2 && <4,
+     megaparsec >=4 && <5,
      bytestring >=0.9.2.1 && <0.11,
      bytestring-builder,
      dlist >=0.7.0 && <0.8.0,
