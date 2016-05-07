@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                pseudo-boolean
-version:             0.1.4.0
+version:             0.1.5.0
 synopsis:            Reading/Writing OPB/WBO files used in pseudo boolean competition
 description:         Reading\/Writing OPB\/WBO files used in pseudo boolean competition
 homepage:            https://github.com/msakai/pseudo-boolean
