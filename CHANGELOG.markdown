@@ -1,3 +1,7 @@
+0.1.4.0
+-------
+* add Megaparsec-based parsers
+
 0.1.3.0
 -------
 * relax the grammer of OPB/WBO files to allow ommitng spaces at the end of weighted terms.
