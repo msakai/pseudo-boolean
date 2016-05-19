@@ -1,3 +1,7 @@
+0.1.5.0
+-------
+* support megaparsec-5.*
+
 0.1.4.0
 -------
 * add Megaparsec-based parsers
