@@ -1,3 +1,7 @@
+0.1.6.0
+-------
+* include #mincost=, #maxcost=, #sumcost= in the hint line of WBO files
+
 0.1.5.0
 -------
 * support megaparsec-5.*

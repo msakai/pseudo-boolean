@@ -66,9 +66,18 @@ wboBuilder wbo = size <> part1 <> part2
     p = wboProducts wbo
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
+    mincost =
+      case [c | (Just c, _) <- wboConstraints wbo] of
+        [] -> 1 -- this should not happen
+        cs -> minimum cs
+    maxcost = maximum $ 0 : [c | (Just c, _) <- wboConstraints wbo]
+    sumcost = Prelude.sum [c | (Just c, _) <- wboConstraints wbo]
     size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
          <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
          <> string7 " #soft= " <> intDec (wboNumSoft wbo)
+         <> string7 " #mincost= " <> integerDec mincost
+         <> string7 " #maxcost= " <> integerDec maxcost
+         <> string7 " #sumcost= " <> integerDec sumcost
          <> char7 '\n'
     part1 = 
       case wboTopCost wbo of
