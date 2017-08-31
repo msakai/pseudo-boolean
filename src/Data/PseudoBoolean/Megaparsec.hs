@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns, FlexibleContexts, TypeFamilies, CPP, ConstraintKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
@@ -38,12 +39,30 @@ import Prelude hiding (sum)
 import Control.Applicative ((<*))
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Maybe
+#if MIN_VERSION_megaparsec(6,0,0)
+import Data.String
+import Data.Word
+import Data.Void
+#endif
 import Text.Megaparsec
+#if MIN_VERSION_megaparsec(6,0,0)
+import Text.Megaparsec.Byte
+#else
 import Text.Megaparsec.Prim (MonadParsec ())
+#endif
 import Data.PseudoBoolean.Types
 import Data.PseudoBoolean.Internal.TextUtil
+
+#if MIN_VERSION_megaparsec(6,0,0)
+
+type C e s m = (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s))
+
+char8 :: C e s m => Char -> m Word8
+char8 = char . fromIntegral . fromEnum
+
+#else
 
 #if MIN_VERSION_megaparsec(5,0,0)
 type C e s m = (MonadParsec e s m, Token s ~ Char)
@@ -51,8 +70,15 @@ type C e s m = (MonadParsec e s m, Token s ~ Char)
 type C e s m = (MonadParsec s m Char)
 #endif
 
+char8 :: C e s m => Char -> m Char
+char8 = char
+
+#endif
+
 -- | Parser for OPB files
-#if MIN_VERSION_megaparsec(5,0,0)
+#if MIN_VERSION_megaparsec(6,0,0)
+opbParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m Formula
+#elif MIN_VERSION_megaparsec(5,0,0)
 opbParser :: (MonadParsec e s m, Token s ~ Char) => m Formula
 #else
 opbParser :: (MonadParsec s m Char) => m Formula
@@ -60,7 +86,9 @@ opbParser :: (MonadParsec s m Char) => m Formula
 opbParser = formula
 
 -- | Parser for WBO files
-#if MIN_VERSION_megaparsec(5,0,0)
+#if MIN_VERSION_megaparsec(6,0,0)
+wboParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m SoftFormula
+#elif MIN_VERSION_megaparsec(5,0,0)
 wboParser :: (MonadParsec e s m, Token s ~ Char) => m SoftFormula
 #else
 wboParser :: (MonadParsec s m Char) => m SoftFormula
@@ -84,7 +112,7 @@ formula = do
 
 hint :: C e s m => m (Int,Int)
 hint = try $ do
-  _ <- char '*'
+  _ <- char8 '*'
   zeroOrMoreSpace
   _ <- string "#variable="
   zeroOrMoreSpace
@@ -103,7 +131,7 @@ sequence_of_comments = skipMany comment -- XXX: we allow empty sequence
 -- <comment>::= "*" <any_sequence_of_characters_other_than_EOL> <EOL>
 comment :: C e s m => m ()
 comment = do
-  _ <- char '*' 
+  _ <- char8 '*' 
   _ <- manyTill anyChar eol
   space -- We relax the grammer and allow spaces in the beggining of next component.
   return ()
@@ -156,15 +184,19 @@ weightedterm = do
 integer :: C e s m => m Integer
 integer = msum
   [ unsigned_integer
-  , char '+' >> unsigned_integer
-  , char '-' >> liftM negate unsigned_integer
+  , char8 '+' >> unsigned_integer
+  , char8 '-' >> liftM negate unsigned_integer
   ]
 
 -- <unsigned_integer>::= <digit> | <digit><unsigned_integer>
 unsigned_integer :: C e s m => m Integer
 unsigned_integer = do
   ds <- some digitChar
+#if MIN_VERSION_megaparsec(6,0,0)
+  return $! readUnsignedInteger (map (toEnum . fromIntegral) ds)
+#else
   return $! readUnsignedInteger ds
+#endif
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: C e s m => m Op
@@ -173,22 +205,22 @@ relational_operator = (string ">=" >> return Ge) <|> (string "=" >> return Eq)
 -- <variablename>::= "x" <unsigned_integer>
 variablename :: C e s m => m Var
 variablename = do
-  _ <- char 'x'
+  _ <- char8 'x'
   i <- unsigned_integer
   return $! fromIntegral i
 
 -- <oneOrMoreSpace>::= " " [<oneOrMoreSpace>]
 oneOrMoreSpace :: C e s m => m ()
-oneOrMoreSpace  = skipSome (char ' ')
+oneOrMoreSpace  = skipSome (char8 ' ')
 
 -- <zeroOrMoreSpace>::= [" " <zeroOrMoreSpace>]
 zeroOrMoreSpace :: C e s m => m ()
--- zeroOrMoreSpace = skipMany (char ' ')
+-- zeroOrMoreSpace = skipMany (char8 ' ')
 zeroOrMoreSpace = space
 -- We relax the grammer and allow more type of spacing
 
 semi :: C e s m => m ()
-semi = char ';' >> space
+semi = char8 ';' >> space
 -- We relax the grammer and allow spaces in the beginning of next component.
 
 {-
@@ -212,18 +244,25 @@ oneOrMoreLiterals = do
 
 -- <literal>::= <variablename> | "~"<variablename>
 literal :: C e s m => m Lit
-literal = variablename <|> (char '~' >> liftM negate variablename)
+literal = variablename <|> (char8 '~' >> liftM negate variablename)
 
 -- | Parse a OPB format string containing pseudo boolean problem.
+#if MIN_VERSION_megaparsec(6,0,0)
+parseOPBString :: String -> String -> Either (ParseError Word8 Void) Formula
+parseOPBString info s = parse (formula <* eof) info (BL.pack s)
+#else
 #if MIN_VERSION_megaparsec(5,0,0)
 parseOPBString :: String -> String -> Either (ParseError Char Dec) Formula
 #else
 parseOPBString :: String -> String -> Either ParseError Formula
 #endif
 parseOPBString = parse (formula <* eof)
+#endif
 
 -- | Parse a OPB format lazy bytestring containing pseudo boolean problem.
-#if MIN_VERSION_megaparsec(5,0,0)
+#if MIN_VERSION_megaparsec(6,0,0)
+parseOPBByteString :: String -> ByteString -> Either (ParseError Word8 Void) Formula
+#elif MIN_VERSION_megaparsec(5,0,0)
 parseOPBByteString :: String -> ByteString -> Either (ParseError Char Dec) Formula
 #else
 parseOPBByteString :: String -> ByteString -> Either ParseError Formula
@@ -231,7 +270,9 @@ parseOPBByteString :: String -> ByteString -> Either ParseError Formula
 parseOPBByteString = parse (formula <* eof)
 
 -- | Parse a OPB file containing pseudo boolean problem.
-#if MIN_VERSION_megaparsec(5,0,0)
+#if MIN_VERSION_megaparsec(6,0,0)
+parseOPBFile :: FilePath -> IO (Either (ParseError Word8 Void) Formula)
+#elif MIN_VERSION_megaparsec(5,0,0)
 parseOPBFile :: FilePath -> IO (Either (ParseError Char Dec) Formula)
 #else
 parseOPBFile :: FilePath -> IO (Either ParseError Formula)
@@ -280,25 +321,32 @@ wbo_comment_or_constraint = (comment >> return Nothing) <|> m
 -- <softconstraint>::= "[" <zeroOrMoreSpace> <unsigned_integer> <zeroOrMoreSpace> "]" <constraint>
 softconstraint :: C e s m => m SoftConstraint
 softconstraint = do
-  _ <- char '['
+  _ <- char8 '['
   zeroOrMoreSpace
   cost <- unsigned_integer
   zeroOrMoreSpace
-  _ <- char ']'
+  _ <- char8 ']'
   zeroOrMoreSpace -- XXX
   c <- constraint
   return (Just cost, c)
 
 -- | Parse a WBO format string containing weighted boolean optimization problem.
+#if MIN_VERSION_megaparsec(6,0,0)
+parseWBOString :: String -> String -> Either (ParseError Word8 Void) SoftFormula
+parseWBOString info s = parse (softformula <* eof) info (BL.pack s)
+#else
 #if MIN_VERSION_megaparsec(5,0,0)
 parseWBOString :: String -> String -> Either (ParseError Char Dec) SoftFormula
 #else
 parseWBOString :: String -> String -> Either ParseError SoftFormula
 #endif
 parseWBOString = parse (softformula <* eof)
+#endif
 
 -- | Parse a WBO format lazy bytestring containing pseudo boolean problem.
-#if MIN_VERSION_megaparsec(5,0,0)
+#if MIN_VERSION_megaparsec(6,0,0)
+parseWBOByteString :: String -> ByteString -> Either (ParseError Word8 Void) SoftFormula
+#elif MIN_VERSION_megaparsec(5,0,0)
 parseWBOByteString :: String -> ByteString -> Either (ParseError Char Dec) SoftFormula
 #else
 parseWBOByteString :: String -> ByteString -> Either ParseError SoftFormula
@@ -306,7 +354,9 @@ parseWBOByteString :: String -> ByteString -> Either ParseError SoftFormula
 parseWBOByteString = parse (softformula <* eof)
 
 -- | Parse a WBO file containing weighted boolean optimization problem.
-#if MIN_VERSION_megaparsec(5,0,0)
+#if MIN_VERSION_megaparsec(6,0,0)
+parseWBOFile :: FilePath -> IO (Either (ParseError Word8 Void) SoftFormula)
+#elif MIN_VERSION_megaparsec(5,0,0)
 parseWBOFile :: FilePath -> IO (Either (ParseError Char Dec) SoftFormula)
 #else
 parseWBOFile :: FilePath -> IO (Either ParseError SoftFormula)
