@@ -69,7 +69,7 @@ Test-suite TestPBFile
     base,
     bytestring,
     tasty >=0.10.1,
-    tasty-hunit ==0.9.*,
+    tasty-hunit >=0.9 && <0.11,
     tasty-quickcheck >=0.8 && <0.10,
     tasty-th,
     HUnit,
