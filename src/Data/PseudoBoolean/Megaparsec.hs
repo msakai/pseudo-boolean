@@ -79,6 +79,11 @@ char8 = char
 
 #endif
 
+#if MIN_VERSION_megaparsec(7,0,0)
+anyChar :: C e s m => m Word8
+anyChar = anySingle
+#endif
+
 -- | Parser for OPB files
 #if MIN_VERSION_megaparsec(6,0,0)
 opbParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m Formula
@@ -250,7 +255,9 @@ oneOrMoreLiterals = do
 literal :: C e s m => m Lit
 literal = variablename <|> (char8 '~' >> liftM negate variablename)
 
-#if MIN_VERSION_megaparsec(6,0,0)
+#if MIN_VERSION_megaparsec(7,0,0)
+type ParseError = MP.ParseErrorBundle BL.ByteString Void
+#elif MIN_VERSION_megaparsec(6,0,0)
 type ParseError = MP.ParseError Word8 Void
 #elif MIN_VERSION_megaparsec(5,0,0)
 type ParseError = MP.ParseError Char Dec
