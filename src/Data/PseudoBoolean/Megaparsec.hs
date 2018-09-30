@@ -33,6 +33,9 @@ module Data.PseudoBoolean.Megaparsec
   , parseWBOString
   , parseWBOByteString
   , parseWBOFile
+
+  -- * Error type
+  , ParseError
   ) where
 
 import Prelude hiding (sum)
@@ -46,7 +49,8 @@ import Data.String
 import Data.Word
 import Data.Void
 #endif
-import Text.Megaparsec
+import Text.Megaparsec hiding (ParseError)
+import qualified Text.Megaparsec as MP
 #if MIN_VERSION_megaparsec(6,0,0)
 import Text.Megaparsec.Byte
 #else
@@ -246,37 +250,28 @@ oneOrMoreLiterals = do
 literal :: C e s m => m Lit
 literal = variablename <|> (char8 '~' >> liftM negate variablename)
 
--- | Parse a OPB format string containing pseudo boolean problem.
 #if MIN_VERSION_megaparsec(6,0,0)
-parseOPBString :: String -> String -> Either (ParseError Word8 Void) Formula
+type ParseError = MP.ParseError Word8 Void
+#elif MIN_VERSION_megaparsec(5,0,0)
+type ParseError = MP.ParseError Char Dec
+#else
+type ParseError = MP.ParseError
+#endif
+
+-- | Parse a OPB format string containing pseudo boolean problem.
+parseOPBString :: String -> String -> Either ParseError Formula
+#if MIN_VERSION_megaparsec(6,0,0)
 parseOPBString info s = parse (formula <* eof) info (BL.pack s)
 #else
-#if MIN_VERSION_megaparsec(5,0,0)
-parseOPBString :: String -> String -> Either (ParseError Char Dec) Formula
-#else
-parseOPBString :: String -> String -> Either ParseError Formula
-#endif
 parseOPBString = parse (formula <* eof)
 #endif
 
 -- | Parse a OPB format lazy bytestring containing pseudo boolean problem.
-#if MIN_VERSION_megaparsec(6,0,0)
-parseOPBByteString :: String -> ByteString -> Either (ParseError Word8 Void) Formula
-#elif MIN_VERSION_megaparsec(5,0,0)
-parseOPBByteString :: String -> ByteString -> Either (ParseError Char Dec) Formula
-#else
 parseOPBByteString :: String -> ByteString -> Either ParseError Formula
-#endif
 parseOPBByteString = parse (formula <* eof)
 
 -- | Parse a OPB file containing pseudo boolean problem.
-#if MIN_VERSION_megaparsec(6,0,0)
-parseOPBFile :: FilePath -> IO (Either (ParseError Word8 Void) Formula)
-#elif MIN_VERSION_megaparsec(5,0,0)
-parseOPBFile :: FilePath -> IO (Either (ParseError Char Dec) Formula)
-#else
 parseOPBFile :: FilePath -> IO (Either ParseError Formula)
-#endif
 parseOPBFile filepath = do
   s <- BL.readFile filepath
   return $! parse (formula <* eof) filepath s
@@ -331,36 +326,19 @@ softconstraint = do
   return (Just cost, c)
 
 -- | Parse a WBO format string containing weighted boolean optimization problem.
+parseWBOString :: String -> String -> Either ParseError SoftFormula
 #if MIN_VERSION_megaparsec(6,0,0)
-parseWBOString :: String -> String -> Either (ParseError Word8 Void) SoftFormula
 parseWBOString info s = parse (softformula <* eof) info (BL.pack s)
 #else
-#if MIN_VERSION_megaparsec(5,0,0)
-parseWBOString :: String -> String -> Either (ParseError Char Dec) SoftFormula
-#else
-parseWBOString :: String -> String -> Either ParseError SoftFormula
-#endif
 parseWBOString = parse (softformula <* eof)
 #endif
 
 -- | Parse a WBO format lazy bytestring containing pseudo boolean problem.
-#if MIN_VERSION_megaparsec(6,0,0)
-parseWBOByteString :: String -> ByteString -> Either (ParseError Word8 Void) SoftFormula
-#elif MIN_VERSION_megaparsec(5,0,0)
-parseWBOByteString :: String -> ByteString -> Either (ParseError Char Dec) SoftFormula
-#else
 parseWBOByteString :: String -> ByteString -> Either ParseError SoftFormula
-#endif
 parseWBOByteString = parse (softformula <* eof)
 
 -- | Parse a WBO file containing weighted boolean optimization problem.
-#if MIN_VERSION_megaparsec(6,0,0)
-parseWBOFile :: FilePath -> IO (Either (ParseError Word8 Void) SoftFormula)
-#elif MIN_VERSION_megaparsec(5,0,0)
-parseWBOFile :: FilePath -> IO (Either (ParseError Char Dec) SoftFormula)
-#else
 parseWBOFile :: FilePath -> IO (Either ParseError SoftFormula)
-#endif
 parseWBOFile filepath = do
   s <- BL.readFile filepath
   return $! parse (softformula <* eof) filepath s
