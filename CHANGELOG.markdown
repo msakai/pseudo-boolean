@@ -1,3 +1,7 @@
+0.1.8.0
+-------
+* make types to be instances of `Read` class
+
 0.1.7.0
 -------
 * introduce `ParserError` type

@@ -58,7 +58,7 @@ data Formula
   , pbNumVars :: !Int
   , pbNumConstraints :: !Int
   }
-  deriving (Eq, Ord, Show, Typeable, Data, Generic)
+  deriving (Eq, Ord, Show, Read, Typeable, Data, Generic)
 
 instance NFData Formula
 instance Hashable Formula
@@ -70,7 +70,7 @@ type Constraint = (Sum, Op, Integer)
 data Op
   = Ge -- ^ /greater than or equal/
   | Eq -- ^ /equal/
-  deriving (Eq, Ord, Show, Enum, Bounded, Typeable, Data, Generic)
+  deriving (Eq, Ord, Show, Read, Enum, Bounded, Typeable, Data, Generic)
 
 instance NFData Op
 instance Hashable Op
@@ -83,7 +83,7 @@ data SoftFormula
   , wboNumVars :: !Int
   , wboNumConstraints :: !Int
   }
-  deriving (Eq, Ord, Show, Typeable, Data, Generic)
+  deriving (Eq, Ord, Show, Read, Typeable, Data, Generic)
 
 instance NFData SoftFormula
 instance Hashable SoftFormula
