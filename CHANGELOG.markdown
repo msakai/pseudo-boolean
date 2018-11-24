@@ -1,3 +1,8 @@
+0.1.7.0
+-------
+* introduce `ParserError` type
+* support megaparsec `7.*`
+
 0.1.6.0
 -------
 * include #mincost=, #maxcost=, #sumcost= in the hint line of WBO files
