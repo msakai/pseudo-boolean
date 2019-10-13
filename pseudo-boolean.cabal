@@ -53,7 +53,7 @@ library
      FlexibleContexts
      OverloadedStrings
   build-depends:
-     base >=4.6.0.1 && <4.13,
+     base >=4.6.0.1 && <4.14,
      containers >=0.4.2.1,
      parsec >=3.1.2 && <4,
      megaparsec >=4 && <8,
