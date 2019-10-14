@@ -1,3 +1,7 @@
+0.1.9.0
+-------
+* fix compilation error with `megaparsec <4.4` due to the lack of MonadPlus requirement
+
 0.1.8.0
 -------
 * make types to be instances of `Read` class
