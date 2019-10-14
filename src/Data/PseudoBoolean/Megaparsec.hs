@@ -70,8 +70,10 @@ char8 = char . fromIntegral . fromEnum
 
 #if MIN_VERSION_megaparsec(5,0,0)
 type C e s m = (MonadParsec e s m, Token s ~ Char)
-#else
+#elif MIN_VERSION_megaparsec(4,4,0)
 type C e s m = (MonadParsec s m Char)
+#else
+type C e s m = (MonadParsec s m Char, MonadPlus m)
 #endif
 
 char8 :: C e s m => Char -> m Char
@@ -89,8 +91,10 @@ anyChar = anySingle
 opbParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m Formula
 #elif MIN_VERSION_megaparsec(5,0,0)
 opbParser :: (MonadParsec e s m, Token s ~ Char) => m Formula
-#else
+#elif MIN_VERSION_megaparsec(4,4,0)
 opbParser :: (MonadParsec s m Char) => m Formula
+#else
+opbParser :: (MonadParsec s m Char, MonadPlus m) => m Formula
 #endif
 opbParser = formula
 
@@ -99,8 +103,10 @@ opbParser = formula
 wboParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m SoftFormula
 #elif MIN_VERSION_megaparsec(5,0,0)
 wboParser :: (MonadParsec e s m, Token s ~ Char) => m SoftFormula
-#else
+#elif MIN_VERSION_megaparsec(4,4,0)
 wboParser :: (MonadParsec s m Char) => m SoftFormula
+#else
+wboParser :: (MonadParsec s m Char, MonadPlus m) => m SoftFormula
 #endif
 wboParser = softformula
 
