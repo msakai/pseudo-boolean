@@ -11,12 +11,12 @@ jobs:
         flags: ['']
         include:
           - ghc: '8.6.5'
-            resolver: '--resolver=lts-14.27'
+            resolver: 'lts-14.27'
           - ghc: '8.8.4'
-            resolver: '--resolver=lts-16.27'
+            resolver: 'lts-16.27'
             coverage: true
           - ghc: '8.10.2'
-            resolver: '--resolver=nightly-2020-11-01'
+            resolver: 'nightly-2020-11-01'
     steps:
       - uses: actions/checkout@v2
 
@@ -36,10 +36,12 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.ghc }}-stack
 
       - name: Build
-        run: stack build ${{ matrix.resolver }} --test --no-run-tests --bench --no-run-benchmarks ${{ matrix.flags }}
+        run: |
+          echo "resolver: ${{ matrix.resolver }}" > stack.yaml
+          stack build --test --no-run-tests --bench --no-run-benchmarks ${{ matrix.flags }}
 
       - name: Test
-        run: stack test ${{ matrix.resolver }} ${{ matrix.flags }}
+        run: stack test ${{ matrix.flags }}
 
       - name: HPC Coveralls
         if: ${{ matrix.coverage }}
