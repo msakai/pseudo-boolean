@@ -126,7 +126,7 @@ constraint = do
 
 -- <sum>::= <weightedterm> | <weightedterm> <sum>
 sum :: Parser Sum
-sum = many1 weightedterm
+sum = many' weightedterm -- we relax the grammer to allow empty sum
 
 -- <weightedterm>::= <integer> <oneOrMoreSpace> <term> <oneOrMoreSpace>
 weightedterm :: Parser WeightedTerm
