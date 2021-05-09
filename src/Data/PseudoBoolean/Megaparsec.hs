@@ -184,7 +184,7 @@ constraint = do
 
 -- <sum>::= <weightedterm> | <weightedterm> <sum>
 sum :: C e s m => m Sum
-sum = some weightedterm
+sum = many weightedterm -- we relax the grammer to allow empty sum
 
 -- <weightedterm>::= <integer> <oneOrMoreSpace> <term> <oneOrMoreSpace>
 weightedterm :: C e s m => m WeightedTerm

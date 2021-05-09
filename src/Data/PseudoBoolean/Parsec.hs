@@ -126,7 +126,7 @@ constraint = do
 
 -- <sum>::= <weightedterm> | <weightedterm> <sum>
 sum :: Stream s m Char => ParsecT s u m Sum
-sum = many1 weightedterm
+sum = many weightedterm -- we relax the grammer to allow empty sum
 
 -- <weightedterm>::= <integer> <oneOrMoreSpace> <term> <oneOrMoreSpace>
 weightedterm :: Stream s m Char => ParsecT s u m WeightedTerm

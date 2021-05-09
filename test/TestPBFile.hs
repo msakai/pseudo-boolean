@@ -41,6 +41,10 @@ case_normalized_mds_50_10_4 = checkOPBFile "test/samples/normalized-mds_50_10_4.
 case_normalized_opt_market_split_4_30_2 = checkOPBFile "test/samples/normalized-opt-market-split_4_30_2.opb"
 case_pigeonhole_5_4 = checkOPBFile "test/samples/pigeonhole_5_4.opb"
 
+case_invalid_obj_empty_sum = checkOPBFile "test/samples/invalid-obj-empty-sum.opb"
+case_invalid_lhs_empty_sum = checkOPBFile "test/samples/invalid-lhs-empty-sum.opb"
+case_invalid_lhs_empty_sum_wbo = checkWBOFile "test/samples/invalid-lhs-empty-sum.wbo"
+
 case_trailing_junk = do
   isError (parseOPBString "" trailingJunk) @?= True
   isError (M.parseOPBString "" trailingJunk) @?= True
