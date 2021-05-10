@@ -1,3 +1,7 @@
+0.1.10.0
+-------
+* allow parsing empty `<sum>`. https://github.com/msakai/pseudo-boolean/pull/5
+
 0.1.9.0
 -------
 * fix compilation error with `megaparsec <4.4` due to the lack of MonadPlus requirement
