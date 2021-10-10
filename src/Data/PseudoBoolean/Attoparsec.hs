@@ -193,7 +193,7 @@ term = oneOrMoreLiterals
 oneOrMoreLiterals :: Parser [Lit]
 oneOrMoreLiterals = do
   l <- literal
-  mplus (try $ oneOrMoreSpace >> liftM (l:) (oneOrMoreLiterals)) (return [l])
+  mplus (try $ oneOrMoreSpace >> liftM (l:) oneOrMoreLiterals) (return [l])
 -- Note that we cannot use sepBy1.
 -- In "p `sepBy1` q", p should success whenever q success.
 -- But it's not the case here.
