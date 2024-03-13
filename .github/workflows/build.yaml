@@ -11,33 +11,43 @@ jobs:
         os: [ubuntu-latest]
         include:
           - ghc: '8.0.2'
+            stack: '2.13'  # Due to a bug, Stack 2.15.1 did not support versions of GHC before 8.2.
             resolver: 'lts-9.21'
             flags: ''
           - ghc: '8.2.2'
+            stack: 'latest'
             resolver: 'lts-11.22'
             flags: ''
           - ghc: '8.4.4'
+            stack: 'latest'
             resolver: 'lts-12.26'
             flags: ''
           - ghc: '8.6.5'
+            stack: 'latest'
             resolver: 'lts-14.27'
             flags: ''
           - ghc: '8.8.4'
+            stack: 'latest'
             resolver: 'lts-16.31'
             flags: ''
           - ghc: '8.10.7'
+            stack: 'latest'
             resolver: 'lts-18.28'
             flags: ''
           - ghc: '9.0.2'
+            stack: 'latest'
             resolver: 'lts-19.33'
             flags: ''
           - ghc: '9.2.8'
+            stack: 'latest'
             resolver: 'lts-20.26'
             flags: ''
           - ghc: '9.4.8'
+            stack: 'latest'
             resolver: 'lts-21.25'
             flags: ''
           - ghc: '9.6.4'
+            stack: 'latest'
             resolver: 'lts-22.13'
             coveralls: true
             flags: '--coverage'
@@ -49,7 +59,7 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc }}
           enable-stack: true
-          stack-version: 'latest'
+          stack-version: ${{ matrix.stack }}
           stack-setup-ghc: true
 
       - uses: actions/cache@v1
