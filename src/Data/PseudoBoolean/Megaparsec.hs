@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns, FlexibleContexts, TypeFamilies, CPP, ConstraintKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
 -- |
