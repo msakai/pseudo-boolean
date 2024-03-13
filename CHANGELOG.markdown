@@ -1,3 +1,7 @@
+0.1.11.0
+-------
+* some minor clean-up
+
 0.1.10.0
 -------
 * allow parsing empty `<sum>`. https://github.com/msakai/pseudo-boolean/pull/5
