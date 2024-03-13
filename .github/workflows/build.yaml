@@ -5,44 +5,61 @@ jobs:
     name: build
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        ghc: ['7.10.3', '8.0.2', '8.2.2', '8.4.4', '8.6.5', '8.8.4', '8.10.7', '9.0.1']
+        ghc: ['8.0.2', '8.2.2', '8.4.4', '8.6.5', '8.8.4', '8.10.7', '9.0.2', '9.2.8', '9.4.8', '9.6.4']
         os: [ubuntu-latest]
         include:
-          - ghc: '7.10.3'
-            resolver: 'lts-6.35'
-            flags: ''
           - ghc: '8.0.2'
+            stack: '2.13'  # Due to a bug, Stack 2.15.1 did not support versions of GHC before 8.2.
             resolver: 'lts-9.21'
             flags: ''
           - ghc: '8.2.2'
+            stack: 'latest'
             resolver: 'lts-11.22'
             flags: ''
           - ghc: '8.4.4'
+            stack: 'latest'
             resolver: 'lts-12.26'
             flags: ''
           - ghc: '8.6.5'
+            stack: 'latest'
             resolver: 'lts-14.27'
             flags: ''
           - ghc: '8.8.4'
+            stack: 'latest'
             resolver: 'lts-16.31'
+            flags: ''
+          - ghc: '8.10.7'
+            stack: 'latest'
+            resolver: 'lts-18.28'
+            flags: ''
+          - ghc: '9.0.2'
+            stack: 'latest'
+            resolver: 'lts-19.33'
+            flags: ''
+          - ghc: '9.2.8'
+            stack: 'latest'
+            resolver: 'lts-20.26'
+            flags: ''
+          - ghc: '9.4.8'
+            stack: 'latest'
+            resolver: 'lts-21.25'
+            flags: ''
+          - ghc: '9.6.4'
+            stack: 'latest'
+            resolver: 'lts-22.13'
             coveralls: true
             flags: '--coverage'
-          - ghc: '8.10.7'
-            resolver: 'lts-18.12'
-            flags: ''
-          - ghc: '9.0.1'
-            resolver: 'nightly-2021-10-02'
-            flags: ''
     steps:
       - uses: actions/checkout@v2
 
-      - uses: haskell/actions/setup@v1
+      - uses: haskell-actions/setup@v2
         name: Setup Haskell
         with:
           ghc-version: ${{ matrix.ghc }}
           enable-stack: true
-          stack-version: 'latest'
+          stack-version: ${{ matrix.stack }}
           stack-setup-ghc: true
 
       - uses: actions/cache@v1
@@ -65,5 +82,5 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
-          curl -L https://github.com/lehins/stack-hpc-coveralls/releases/download/v0.0.6.0/shc.tar.gz | tar -xz
+          curl -L https://github.com/rubik/stack-hpc-coveralls/releases/download/v0.0.7.0/shc-Linux-X64.tar.bz2 | tar -xj
           ./shc --repo-token="$COVERALLS_REPO_TOKEN" pseudo-boolean TestPBFile
