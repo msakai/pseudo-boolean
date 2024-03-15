@@ -40,7 +40,6 @@ module Data.PseudoBoolean.Megaparsec
   ) where
 
 import Prelude hiding (sum)
-import Control.Applicative ((<*))
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BL

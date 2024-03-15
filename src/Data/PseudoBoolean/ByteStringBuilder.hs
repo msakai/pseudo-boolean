@@ -32,7 +32,6 @@ import Prelude hiding (sum)
 import qualified Data.IntSet as IntSet
 import qualified Data.Set as Set
 import Data.List (sortBy)
-import Data.Monoid hiding (Sum (..))
 import qualified Data.ByteString.Lazy as BS
 import Data.ByteString.Builder (Builder, intDec, integerDec, char7, string7, hPutBuilder, toLazyByteString)
 import Data.Ord
