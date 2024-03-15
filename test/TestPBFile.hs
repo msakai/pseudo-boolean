@@ -29,6 +29,10 @@ case_exampleWBO1_file = checkWBOFile "test/samples/example1.wbo"
 case_exampleWBO2_file = checkWBOFile "test/samples/example2.wbo"
 case_exampleWBO3_file = checkWBOFile "test/samples/example3.wbo"
 
+case_pb24_testlin_file  = checkOPBFile "test/samples/PB24/testlin.pb"
+case_pb24_testnlc_file = checkOPBFile "test/samples/PB24/testnlc.pb"
+case_pb24_mult_file = checkOPBFile "test/samples/PB24/mult.pb"
+
 case_exampleLIN_PBS_file = checkOPBFile "test/samples/example-lin-pbs.opb"
 case_exampleLIN_nohint_file = checkOPBFile "test/samples/example-lin-nohint.opb"
 case_exampleLIN_nospaces_file = checkOPBFile "test/samples/example-lin-nospaces.opb"
