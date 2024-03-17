@@ -35,7 +35,6 @@ module Data.PseudoBoolean.Parsec
   ) where
 
 import Prelude hiding (sum)
-import Control.Applicative ((<*))
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
 import Data.Maybe

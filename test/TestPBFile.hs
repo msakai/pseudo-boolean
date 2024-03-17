@@ -2,11 +2,9 @@
 {-# OPTIONS_GHC -Wall #-}
 module Main (main) where
 
-import Data.Either
 import qualified Data.ByteString.Lazy.Char8 as BSChar8
 import System.IO
 import System.IO.Temp
-import Test.Tasty
 import Test.Tasty.QuickCheck
 import Test.Tasty.HUnit
 import Test.Tasty.TH

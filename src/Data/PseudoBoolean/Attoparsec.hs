@@ -33,7 +33,7 @@ module Data.PseudoBoolean.Attoparsec
   ) where
 
 import Prelude hiding (sum)
-import Control.Applicative ((<|>), (<*))
+import Control.Applicative ((<|>))
 import Control.Monad
 import Data.Attoparsec.ByteString.Char8 hiding (isDigit)
 import qualified Data.Attoparsec.ByteString.Lazy as L

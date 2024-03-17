@@ -27,7 +27,6 @@ import qualified Data.DList as DList
 import qualified Data.IntSet as IntSet
 import qualified Data.Set as Set
 import Data.List (sortBy)
-import Data.Monoid hiding (Sum (..))
 import Data.Ord
 import Data.String
 import Text.Printf

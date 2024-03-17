@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, FlexibleContexts, TypeFamilies, CPP, ConstraintKinds #-}
+{-# LANGUAGE BangPatterns, FlexibleContexts, TypeFamilies, ConstraintKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wall #-}
@@ -40,75 +40,33 @@ module Data.PseudoBoolean.Megaparsec
   ) where
 
 import Prelude hiding (sum)
-import Control.Applicative ((<*))
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Maybe
-#if MIN_VERSION_megaparsec(6,0,0)
 import Data.String
 import Data.Word
 import Data.Void
-#endif
 import Text.Megaparsec hiding (ParseError)
 import qualified Text.Megaparsec as MP
-#if MIN_VERSION_megaparsec(6,0,0)
 import Text.Megaparsec.Byte
-#else
-import Text.Megaparsec.Prim (MonadParsec ())
-#endif
 import Data.PseudoBoolean.Types
 import Data.PseudoBoolean.Internal.TextUtil
-
-#if MIN_VERSION_megaparsec(6,0,0)
 
 type C e s m = (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s))
 
 char8 :: C e s m => Char -> m Word8
 char8 = char . fromIntegral . fromEnum
 
-#else
-
-#if MIN_VERSION_megaparsec(5,0,0)
-type C e s m = (MonadParsec e s m, Token s ~ Char)
-#elif MIN_VERSION_megaparsec(4,4,0)
-type C e s m = (MonadParsec s m Char)
-#else
-type C e s m = (MonadParsec s m Char, MonadPlus m)
-#endif
-
-char8 :: C e s m => Char -> m Char
-char8 = char
-
-#endif
-
-#if MIN_VERSION_megaparsec(7,0,0)
 anyChar :: C e s m => m Word8
 anyChar = anySingle
-#endif
 
 -- | Parser for OPB files
-#if MIN_VERSION_megaparsec(6,0,0)
 opbParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m Formula
-#elif MIN_VERSION_megaparsec(5,0,0)
-opbParser :: (MonadParsec e s m, Token s ~ Char) => m Formula
-#elif MIN_VERSION_megaparsec(4,4,0)
-opbParser :: (MonadParsec s m Char) => m Formula
-#else
-opbParser :: (MonadParsec s m Char, MonadPlus m) => m Formula
-#endif
 opbParser = formula
 
 -- | Parser for WBO files
-#if MIN_VERSION_megaparsec(6,0,0)
 wboParser :: (MonadParsec e s m, Token s ~ Word8, IsString (Tokens s)) => m SoftFormula
-#elif MIN_VERSION_megaparsec(5,0,0)
-wboParser :: (MonadParsec e s m, Token s ~ Char) => m SoftFormula
-#elif MIN_VERSION_megaparsec(4,4,0)
-wboParser :: (MonadParsec s m Char) => m SoftFormula
-#else
-wboParser :: (MonadParsec s m Char, MonadPlus m) => m SoftFormula
-#endif
 wboParser = softformula
 
 -- <formula>::= <sequence_of_comments> [<objective>] <sequence_of_comments_or_constraints>
@@ -208,11 +166,7 @@ integer = msum
 unsigned_integer :: C e s m => m Integer
 unsigned_integer = do
   ds <- some digitChar
-#if MIN_VERSION_megaparsec(6,0,0)
   return $! readUnsignedInteger (map (toEnum . fromIntegral) ds)
-#else
-  return $! readUnsignedInteger ds
-#endif
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: C e s m => m Op
@@ -262,23 +216,11 @@ oneOrMoreLiterals = do
 literal :: C e s m => m Lit
 literal = variablename <|> (char8 '~' >> liftM negate variablename)
 
-#if MIN_VERSION_megaparsec(7,0,0)
 type ParseError = MP.ParseErrorBundle BL.ByteString Void
-#elif MIN_VERSION_megaparsec(6,0,0)
-type ParseError = MP.ParseError Word8 Void
-#elif MIN_VERSION_megaparsec(5,0,0)
-type ParseError = MP.ParseError Char Dec
-#else
-type ParseError = MP.ParseError
-#endif
 
 -- | Parse a OPB format string containing pseudo boolean problem.
 parseOPBString :: String -> String -> Either ParseError Formula
-#if MIN_VERSION_megaparsec(6,0,0)
 parseOPBString info s = parse (formula <* eof) info (BL.pack s)
-#else
-parseOPBString = parse (formula <* eof)
-#endif
 
 -- | Parse a OPB format lazy bytestring containing pseudo boolean problem.
 parseOPBByteString :: String -> ByteString -> Either ParseError Formula
@@ -341,11 +283,7 @@ softconstraint = do
 
 -- | Parse a WBO format string containing weighted boolean optimization problem.
 parseWBOString :: String -> String -> Either ParseError SoftFormula
-#if MIN_VERSION_megaparsec(6,0,0)
 parseWBOString info s = parse (softformula <* eof) info (BL.pack s)
-#else
-parseWBOString = parse (softformula <* eof)
-#endif
 
 -- | Parse a WBO format lazy bytestring containing pseudo boolean problem.
 parseWBOByteString :: String -> ByteString -> Either ParseError SoftFormula
