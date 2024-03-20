@@ -21,7 +21,9 @@ module Data.PseudoBoolean.Types
   (
   -- * Abstract Syntax
     Formula (..)
+  , Objective
   , Constraint
+  , OptDir (..)
   , Op (..)
   , SoftFormula (..)
   , SoftConstraint
@@ -43,6 +45,7 @@ import GHC.Generics (Generic)
 import Control.Monad
 import Control.DeepSeq
 import Data.Data
+import Data.OptDir
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.IntSet (IntSet)
@@ -53,7 +56,7 @@ import Data.Maybe
 -- | Pair of /objective function/ and a list of constraints.
 data Formula
   = Formula
-  { pbObjectiveFunction :: Maybe Sum
+  { pbObjectiveFunction :: Maybe Objective
   , pbConstraints :: [Constraint]
   , pbNumVars :: !Int
   , pbNumConstraints :: !Int
@@ -62,6 +65,9 @@ data Formula
 
 instance NFData Formula
 instance Hashable Formula
+
+-- | Objective type and sum of weighted terms.
+type Objective = (OptDir, Sum)
 
 -- | Lhs, relational operator and rhs.
 type Constraint = (Sum, Op, Integer)
@@ -128,7 +134,7 @@ wboComputeNumVars cs = maximum (0 : vs)
 
 pbProducts :: Formula -> Set IntSet
 pbProducts formula = Set.fromList $ do  
-  s <- maybeToList (pbObjectiveFunction formula) ++ [s | (s,_,_) <- pbConstraints formula]
+  s <- maybeToList (fmap snd (pbObjectiveFunction formula)) ++ [s | (s,_,_) <- pbConstraints formula]
   (_, tm)  <- s
   let tm2 = IntSet.fromList tm
   guard $ IntSet.size tm2 > 1

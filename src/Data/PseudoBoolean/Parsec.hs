@@ -62,7 +62,7 @@ formula = do
     Formula
     { pbObjectiveFunction = obj
     , pbConstraints = cs
-    , pbNumVars = fromMaybe (pbComputeNumVars obj cs) (fmap fst h)
+    , pbNumVars = fromMaybe (pbComputeNumVars (fmap snd obj) cs) (fmap fst h)
     , pbNumConstraints = fromMaybe (length cs) (fmap snd h)
     }
 
@@ -103,14 +103,14 @@ comment_or_constraint :: Stream s m Char => ParsecT s u m (Maybe Constraint)
 comment_or_constraint =
   (comment >> return Nothing) <|> (liftM Just constraint)
 
--- <objective>::= "min:" <zeroOrMoreSpace> <sum> ";"
-objective :: Stream s m Char => ParsecT s u m Sum
+-- <objective>::= <objective_type> <zeroOrMoreSpace> <sum> ";"
+objective :: Stream s m Char => ParsecT s u m Objective
 objective = do
-  _ <- string "min:"
+  dir <- objective_type
   zeroOrMoreSpace
   obj <- sum
   semi
-  return obj
+  return (dir, obj)
 
 -- <constraint>::= <sum> <relational_operator> <zeroOrMoreSpace> <integer> <zeroOrMoreSpace> ";"
 constraint :: Stream s m Char => ParsecT s u m Constraint
@@ -149,6 +149,10 @@ unsigned_integer :: Stream s m Char => ParsecT s u m Integer
 unsigned_integer = do
   ds <- many1 digit
   return $! readUnsignedInteger ds
+
+-- <objective_type>::= "min:" | "max:"
+objective_type :: Stream s m Char => ParsecT s u m OptDir
+objective_type = (try (string "min:") >> return OptMin) <|> (string "max:" >> return OptMax)
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: Stream s m Char => ParsecT s u m Op

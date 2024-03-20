@@ -80,7 +80,7 @@ formula = do
     Formula
     { pbObjectiveFunction = obj
     , pbConstraints = cs
-    , pbNumVars = fromMaybe (pbComputeNumVars obj cs) (fmap fst h)
+    , pbNumVars = fromMaybe (pbComputeNumVars (fmap snd obj) cs) (fmap fst h)
     , pbNumConstraints = fromMaybe (length cs) (fmap snd h)
     }
 
@@ -121,14 +121,14 @@ comment_or_constraint :: C e s m => m (Maybe Constraint)
 comment_or_constraint =
   (comment >> return Nothing) <|> (liftM Just constraint)
 
--- <objective>::= "min:" <zeroOrMoreSpace> <sum> ";"
-objective :: C e s m => m Sum
+--  <objective>::= <objective_type> <zeroOrMoreSpace> <sum> ";"
+objective :: C e s m => m Objective
 objective = do
-  _ <- string "min:"
+  dir <- objective_type
   zeroOrMoreSpace
   obj <- sum
   semi
-  return obj
+  return (dir, obj)
 
 -- <constraint>::= <sum> <relational_operator> <zeroOrMoreSpace> <integer> <zeroOrMoreSpace> ";"
 constraint :: C e s m => m Constraint
@@ -167,6 +167,10 @@ unsigned_integer :: C e s m => m Integer
 unsigned_integer = do
   ds <- some digitChar
   return $! readUnsignedInteger (map (toEnum . fromIntegral) ds)
+
+-- <objective_type>::= "min:" | "max:"
+objective_type :: C e s m => m OptDir
+objective_type = (try (string "min:") >> return OptMin) <|> (string "max:" >> return OptMax)
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: C e s m => m Op
