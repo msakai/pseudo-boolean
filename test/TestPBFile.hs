@@ -307,6 +307,10 @@ checkOPBFile fname = do
   case r of
     Left err -> assertFailure $ show err
     Right opb -> do
+      let s = toOPBString opb
+          bs = toOPBByteString opb
+      BSChar8.unpack bs @?= s
+
       r2 <- M.parseOPBFile fname
       case r2 of
         Left err2 -> assertFailure $ show err2
