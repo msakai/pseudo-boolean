@@ -1,3 +1,8 @@
+0.2.0.0
+-------
+* allow parsing maximization problem as specified in
+  https://www.cril.univ-artois.fr/PB24/OPBgeneral.pdf
+
 0.1.11.0
 -------
 * some minor clean-up

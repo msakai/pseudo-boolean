@@ -50,7 +50,7 @@ jobs:
 
       - name: Build
         run: |
-          echo "resolver: ${{ matrix.resolver }}" > stack.yaml
+          sed -i "s/resolver: .*/resolver: ${{ matrix.resolver }}/" stack.yaml
           echo "system-ghc: true" >> stack.yaml
           stack build --test --no-run-tests --bench --no-run-benchmarks ${{ matrix.flags }}
 

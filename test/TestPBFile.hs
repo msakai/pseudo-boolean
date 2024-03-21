@@ -47,6 +47,8 @@ case_invalid_obj_empty_sum = checkOPBFile "test/samples/invalid-obj-empty-sum.op
 case_invalid_lhs_empty_sum = checkOPBFile "test/samples/invalid-lhs-empty-sum.opb"
 case_invalid_lhs_empty_sum_wbo = checkWBOFile "test/samples/invalid-lhs-empty-sum.wbo"
 
+case_general_testlin_max_file  = checkOPBFile "test/samples/general/testlin-max.pb"
+
 case_trailing_junk = do
   isError (parseOPBString "" trailingJunk) @?= True
   isError (M.parseOPBString "" trailingJunk) @?= True
@@ -305,6 +307,10 @@ checkOPBFile fname = do
   case r of
     Left err -> assertFailure $ show err
     Right opb -> do
+      let s = toOPBString opb
+          bs = toOPBByteString opb
+      BSChar8.unpack bs @?= s
+
       r2 <- M.parseOPBFile fname
       case r2 of
         Left err2 -> assertFailure $ show err2

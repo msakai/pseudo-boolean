@@ -53,7 +53,11 @@ opbBuilder opb = (size <> part1 <> part2)
     part1 = 
       case pbObjectiveFunction opb of
         Nothing -> mempty
-        Just o -> string7 "min: " <> showSum o <> string7 ";\n"
+        Just (dir, o) ->
+          (case dir of
+            OptMin -> string7 "min"
+            OptMax -> string7 "max")
+          <> string7 ": " <> showSum o <> string7 ";\n"
     part2 = mconcat $ map showConstraint (pbConstraints opb)
 
 -- | A ByteString Builder which renders a WBO format byte-string containing weighted boolean optimization problem.

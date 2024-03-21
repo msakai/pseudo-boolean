@@ -63,7 +63,7 @@ formula = do
     Formula
     { pbObjectiveFunction = obj
     , pbConstraints = cs
-    , pbNumVars = fromMaybe (pbComputeNumVars obj cs) (fmap fst h)
+    , pbNumVars = fromMaybe (pbComputeNumVars (fmap snd obj) cs) (fmap fst h)
     , pbNumConstraints = fromMaybe (length cs) (fmap snd h)
     }
 
@@ -104,14 +104,14 @@ comment_or_constraint :: Parser (Maybe Constraint)
 comment_or_constraint =
   (comment >> return Nothing) <|> (liftM Just constraint)
 
--- <objective>::= "min:" <zeroOrMoreSpace> <sum> ";"
-objective :: Parser Sum
+-- <objective>::= <objective_type> <zeroOrMoreSpace> <sum> ";"
+objective :: Parser Objective
 objective = do
-  _ <- string "min:"
+  dir <- objective_type
   zeroOrMoreSpace
   obj <- sum
   semi
-  return obj
+  return (dir, obj)
 
 -- <constraint>::= <sum> <relational_operator> <zeroOrMoreSpace> <integer> <zeroOrMoreSpace> ";"
 constraint :: Parser Constraint
@@ -150,6 +150,10 @@ unsigned_integer :: Parser Integer
 unsigned_integer = do
   ds <- takeWhile1 isDigit
   return $! readUnsignedInteger $ BS.unpack ds
+
+-- <objective_type>::= "min:" | "max:"
+objective_type :: Parser OptDir
+objective_type = (string "min:" >> return OptMin) <|> (string "max:" >> return OptMax)
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: Parser Op

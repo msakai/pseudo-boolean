@@ -47,7 +47,11 @@ opbBuilder opb = (size <> part1 <> part2)
     part1 = 
       case pbObjectiveFunction opb of
         Nothing -> mempty
-        Just o -> fromString "min: " <> showSum o <> fromString ";\n"
+        Just (dir, o) ->
+          (case dir of
+            OptMin -> fromString "min"
+            OptMax -> fromString "max")
+          <> fromString ": " <> showSum o <> fromString ";\n"
     part2 = mconcat $ map showConstraint (pbConstraints opb)
 
 -- | A builder which renders a WBO format in any String-like 'Monoid'.
