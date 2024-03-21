@@ -273,6 +273,7 @@ exampleWBO1 :: String
 exampleWBO1 = unlines $
   [ "* #variable= 1 #constraint= 2 #soft= 2 mincost= 2 maxcost= 3 sumcost= 5"
   , "soft: 6 ;"
+  , "* comment line"
   , "[2] +1 x1 >= 1 ;"
   , "[3] -1 x1 >= 0 ;"
   ]
