@@ -107,7 +107,11 @@ showConstraint (lhs, op, rhs) =
   showSum lhs <> f op <>  char7 ' ' <> integerDec rhs <> string7 ";\n"
   where
     f Eq = char7 '='
+    f NEq = string7 "!="
+    f Gt = string7 ">"
     f Ge = string7 ">="
+    f Lt = string7 "<"
+    f Le = string7 "<="
 
 showSoftConstraint :: SoftConstraint -> Builder
 showSoftConstraint (cost, constr) =

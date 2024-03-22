@@ -156,7 +156,14 @@ objective_type = (try (string "min:") >> return OptMin) <|> (string "max:" >> re
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: Stream s m Char => ParsecT s u m Op
-relational_operator = (string ">=" >> return Ge) <|> (string "=" >> return Eq)
+relational_operator = msum $ map try
+  [ string "=" >> return Eq
+  , string "!=" >> return NEq
+  , string ">=" >> return Ge
+  , string ">" >> return Gt
+  , string "<=" >> return Le
+  , string "<" >> return Lt
+  ]
 
 -- <variablename>::= "x" <unsigned_integer>
 variablename :: Stream s m Char => ParsecT s u m Var

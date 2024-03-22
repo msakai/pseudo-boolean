@@ -157,7 +157,14 @@ objective_type = (string "min:" >> return OptMin) <|> (string "max:" >> return O
 
 -- <relational_operator>::= ">=" | "="
 relational_operator :: Parser Op
-relational_operator = (string ">=" >> return Ge) <|> (string "=" >> return Eq)
+relational_operator = msum
+  [ string "=" >> return Eq
+  , string "!=" >> return NEq
+  , string ">=" >> return Ge
+  , string ">" >> return Gt
+  , string "<=" >> return Le
+  , string "<" >> return Lt
+  ]
 
 -- <variablename>::= "x" <unsigned_integer>
 variablename :: Parser Var

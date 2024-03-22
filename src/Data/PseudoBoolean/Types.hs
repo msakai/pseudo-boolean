@@ -75,7 +75,11 @@ type Constraint = (Sum, Op, Integer)
 -- | Relational operators
 data Op
   = Ge -- ^ /greater than or equal/
+  | Le -- ^ /lesser than or equal/
+  | Gt -- ^ /greater than/
+  | Lt -- ^ /lesser than/
   | Eq -- ^ /equal/
+  | NEq -- ^ /not equal/
   deriving (Eq, Ord, Show, Read, Enum, Bounded, Typeable, Data, Generic)
 
 instance NFData Op
