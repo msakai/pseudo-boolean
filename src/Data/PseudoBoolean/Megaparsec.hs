@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns, FlexibleContexts, TypeFamilies, ConstraintKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wall #-}
 -----------------------------------------------------------------------------
@@ -42,8 +43,10 @@ module Data.PseudoBoolean.Megaparsec
 import Prelude hiding (sum)
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
-import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import Data.Maybe
+import Data.Proxy
 import Data.String
 import Data.Word
 import Data.Void
@@ -173,7 +176,7 @@ objective_type :: C e s m => m OptDir
 objective_type = (try (string "min:") >> return OptMin) <|> (string "max:" >> return OptMax)
 
 -- <relational_operator>::= ">=" | "="
-relational_operator :: C e s m => m Op
+relational_operator :: forall e s m. C e s m => m Op
 relational_operator = msum $ map try
   [ string "=" >> return Eq
   , string "!=" >> return NEq
@@ -181,7 +184,13 @@ relational_operator = msum $ map try
   , string ">" >> return Gt
   , string "<=" >> return Le
   , string "<" >> return Lt
+  , u8string "≠" >> return NEq
+  , u8string "≥" >> return Ge
+  , u8string "≤" >> return Le
   ]
+  where
+    -- XXX: We cannot assume Tokens s ~ ByteString
+    u8string = string . tokensToChunk (Proxy :: Proxy s) . BL.unpack  . UTF8.fromString
 
 -- <variablename>::= "x" <unsigned_integer>
 variablename :: C e s m => m Var
@@ -231,7 +240,7 @@ type ParseError = MP.ParseErrorBundle BL.ByteString Void
 
 -- | Parse a OPB format string containing pseudo boolean problem.
 parseOPBString :: String -> String -> Either ParseError Formula
-parseOPBString info s = parse (formula <* eof) info (BL.pack s)
+parseOPBString info s = parse (formula <* eof) info (UTF8.fromString s)
 
 -- | Parse a OPB format lazy bytestring containing pseudo boolean problem.
 parseOPBByteString :: String -> ByteString -> Either ParseError Formula
@@ -294,7 +303,7 @@ softconstraint = do
 
 -- | Parse a WBO format string containing weighted boolean optimization problem.
 parseWBOString :: String -> String -> Either ParseError SoftFormula
-parseWBOString info s = parse (softformula <* eof) info (BL.pack s)
+parseWBOString info s = parse (softformula <* eof) info (UTF8.fromString s)
 
 -- | Parse a WBO format lazy bytestring containing pseudo boolean problem.
 parseWBOByteString :: String -> ByteString -> Either ParseError SoftFormula

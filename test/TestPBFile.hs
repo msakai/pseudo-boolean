@@ -49,7 +49,19 @@ case_invalid_lhs_empty_sum_wbo = checkWBOFile "test/samples/invalid-lhs-empty-su
 
 case_general_testlin_max_file  = checkOPBFile "test/samples/general/testlin-max.pb"
 case_general_relational_operator_file  = checkOPBFile "test/samples/general/test-relational-operator.pb"
+case_general_relational_operator_unicode_file  = checkOPBFile "test/samples/general/test-relational-operator-unicode.pb"
 case_general_relational_operator = checkOPBString "general relational operator" exampleGeneralRelationalOperator
+case_general_relational_operator_unicode = checkOPBString "general relational operator unicode" exampleGeneralRelationalOperatorUnicode
+
+case_general_relational_operator_unicode_equivalence = do
+  Right expected <- parseOPBFile "test/samples/general/test-relational-operator.pb"
+  Right opbP <- parseOPBFile "test/samples/general/test-relational-operator-unicode.pb"
+  expected @?= opbP
+  Right opbM <- M.parseOPBFile "test/samples/general/test-relational-operator-unicode.pb"
+  expected @?= opbM
+  Right opbA <- A.parseOPBFile "test/samples/general/test-relational-operator-unicode.pb"
+  expected @?= opbA
+
 
 case_trailing_junk = do
   isError (parseOPBString "" trailingJunk) @?= True
@@ -311,6 +323,18 @@ exampleGeneralRelationalOperator  = unlines $
   , "-1 x4 -2 x5 < 0;"
   , "+1 x5 +2 x6 = 3;"
   , "-1 x6 -2 x7 != -3;"
+  ]
+
+exampleGeneralRelationalOperatorUnicode :: String
+exampleGeneralRelationalOperatorUnicode  = unlines $
+  [ "* #variable= 7 #constraint= 6"
+  , "max: 1 x1 ;"
+  , "+1 x1 +2 x2 ≥ 1;"
+  , "-1 x2 -2 x3 ≤ -1;"
+  , "+1 x3 +2 x4 > 1;"
+  , "-1 x4 -2 x5 < 0;"
+  , "+1 x5 +2 x6 = 3;"
+  , "-1 x6 -2 x7 ≠ -3;"
   ]
 
 ------------------------------------------------------------------------

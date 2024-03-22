@@ -37,9 +37,10 @@ module Data.PseudoBoolean.Parsec
 import Prelude hiding (sum)
 import Control.Monad
 import Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Lazy as BL
 import Data.Maybe
+import qualified Data.Text.Lazy.Encoding as TL
 import Text.Parsec
-import qualified Text.Parsec.ByteString.Lazy as ParsecBS
 import Data.PseudoBoolean.Types
 import Data.PseudoBoolean.Internal.TextUtil
 
@@ -163,6 +164,9 @@ relational_operator = msum $ map try
   , string ">" >> return Gt
   , string "<=" >> return Le
   , string "<" >> return Lt
+  , string "≠" >> return NEq
+  , string "≥" >> return Ge
+  , string "≤" >> return Le
   ]
 
 -- <variablename>::= "x" <unsigned_integer>
@@ -222,7 +226,9 @@ parseOPBByteString = parse (formula <* eof)
 
 -- | Parse a OPB file containing pseudo boolean problem.
 parseOPBFile :: FilePath -> IO (Either ParseError Formula)
-parseOPBFile = ParsecBS.parseFromFile (formula <* eof)
+parseOPBFile fname = do
+  input <- BL.readFile fname
+  return $ runP (formula <* eof) () fname (TL.decodeUtf8 input)
 
 
 -- <softformula>::= <sequence_of_comments> <softheader> <sequence_of_comments_or_constraints>
@@ -284,4 +290,6 @@ parseWBOByteString = parse (softformula <* eof)
 
 -- | Parse a WBO file containing weighted boolean optimization problem.
 parseWBOFile :: FilePath -> IO (Either ParseError SoftFormula)
-parseWBOFile = ParsecBS.parseFromFile (softformula <* eof)
+parseWBOFile fname = do
+  input <- BL.readFile fname
+  return $ runP (softformula <* eof) () fname (TL.decodeUtf8 input)

@@ -39,6 +39,7 @@ import Data.Attoparsec.ByteString.Char8 hiding (isDigit)
 import qualified Data.Attoparsec.ByteString.Lazy as L
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy as BSLazy
+import qualified Data.ByteString.UTF8 as UTF8
 import Data.Char
 import Data.Maybe
 import Data.PseudoBoolean.Types
@@ -164,7 +165,12 @@ relational_operator = msum
   , string ">" >> return Gt
   , string "<=" >> return Le
   , string "<" >> return Lt
+  , u8string "≠" >> return NEq
+  , u8string "≥" >> return Ge
+  , u8string "≤" >> return Le
   ]
+  where
+    u8string = string . UTF8.fromString
 
 -- <variablename>::= "x" <unsigned_integer>
 variablename :: Parser Var
