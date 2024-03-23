@@ -190,7 +190,7 @@ relational_operator = msum $ map try
   ]
   where
     -- XXX: We cannot assume Tokens s ~ ByteString
-    u8string = string . tokensToChunk (Proxy :: Proxy s) . BL.unpack  . UTF8.fromString
+    u8string s = label s (string . tokensToChunk (Proxy :: Proxy s) . BL.unpack  . UTF8.fromString $ s)
 
 -- <variablename>::= "x" <unsigned_integer>
 variablename :: C e s m => m Var
