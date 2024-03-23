@@ -1,7 +1,10 @@
 0.2.0.0
 -------
-* allow parsing maximization problem as specified in
+* Support some features described in “General OPB Format”
   https://www.cril.univ-artois.fr/PB24/OPBgeneral.pdf
+  * allow both min and max keywords in the objective function
+  * allow any usual relational operator in constraints
+  * allow to use Unicode characters and the UTF-8 encoding for relational operators
 
 0.1.11.0
 -------
