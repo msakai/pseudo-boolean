@@ -99,7 +99,11 @@ showConstraint (lhs, op, rhs) =
   showSum lhs <> f op <>  fromString " " <> fromString (show rhs) <> fromString ";\n"
   where
     f Eq = fromString "="
+    f NEq = fromString "!="
+    f Gt = fromString ">"
     f Ge = fromString ">="
+    f Lt = fromString "<"
+    f Le = fromString "<="
 
 showSoftConstraint :: (Monoid a, IsString a) => SoftConstraint -> a
 showSoftConstraint (cost, constr) =
