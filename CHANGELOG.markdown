@@ -5,6 +5,7 @@
   * allow both min and max keywords in the objective function
   * allow any usual relational operator in constraints
   * allow to use Unicode characters and the UTF-8 encoding for relational operators
+  * support model counting and model enumeration
 
 0.1.11.0
 -------

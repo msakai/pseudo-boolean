@@ -21,6 +21,7 @@ module Data.PseudoBoolean.Types
   (
   -- * Abstract Syntax
     Formula (..)
+  , ModelCountingOrEnumeration (..)
   , Objective
   , Constraint
   , OptDir (..)
@@ -56,7 +57,8 @@ import Data.Maybe
 -- | Pair of /objective function/ and a list of constraints.
 data Formula
   = Formula
-  { pbObjectiveFunction :: Maybe Objective
+  { pbModelCountingOrEnumeration :: Maybe (ModelCountingOrEnumeration, Maybe [Lit])
+  , pbObjectiveFunction :: Maybe Objective
   , pbConstraints :: [Constraint]
   , pbNumVars :: !Int
   , pbNumConstraints :: !Int
@@ -65,6 +67,15 @@ data Formula
 
 instance NFData Formula
 instance Hashable Formula
+
+-- | Specifier for model counting/enumeration problems
+data ModelCountingOrEnumeration
+  = ModelCounting
+  | ModelEnumeration
+  deriving (Eq, Ord, Show, Read, Enum, Bounded, Typeable, Data, Generic)
+
+instance NFData ModelCountingOrEnumeration
+instance Hashable ModelCountingOrEnumeration
 
 -- | Objective type and sum of weighted terms.
 type Objective = (OptDir, Sum)
