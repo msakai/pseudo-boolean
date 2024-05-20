@@ -58,11 +58,13 @@ formula :: Parser Formula
 formula = do
   h <- optionMaybe hint
   sequence_of_comments
+  countOrEnum <- optionMaybe (count_or_enum_header <* sequence_of_comments)
   obj <- optionMaybe objective
   cs <- sequence_of_comments_or_constraints
   return $
     Formula
-    { pbObjectiveFunction = obj
+    { pbModelCountingOrEnumeration = countOrEnum
+    , pbObjectiveFunction = obj
     , pbConstraints = cs
     , pbNumVars = fromMaybe (pbComputeNumVars (fmap snd obj) cs) (fmap fst h)
     , pbNumConstraints = fromMaybe (length cs) (fmap snd h)
@@ -218,6 +220,32 @@ oneOrMoreLiterals = do
 -- <literal>::= <variablename> | "~"<variablename>
 literal :: Parser Lit
 literal = variablename <|> (char '~' >> liftM negate variablename)
+
+count_or_enum_header :: Parser (ModelCountingOrEnumeration, Maybe [Lit])
+count_or_enum_header = msum
+  [ do _ <- string "models:"
+       zeroOrMoreSpace
+       countOrEnum <- (string "count" >> pure ModelCounting) <|> (string "enumerate" >> pure ModelEnumeration)
+       zeroOrMoreSpace
+       semi
+       lits <- optionMaybe $ do
+         sequence_of_comments
+         _ <- string "project:"
+         zeroOrMoreSpace
+         lits <- oneOrMoreLiterals <|> pure []
+         zeroOrMoreSpace
+         semi
+         return lits
+       return (countOrEnum, lits)
+  , do countOrEnum <- (string "count" >> pure ModelCounting) <|> (string "enum" >> pure ModelEnumeration)
+       _ <- char ':'
+       zeroOrMoreSpace
+       lits <- oneOrMoreLiterals <|> pure []
+       zeroOrMoreSpace
+       semi
+       return (countOrEnum, if null lits then Nothing else Just lits)
+  ]
+
 
 -- | Parse a OPB format string containing pseudo boolean problem.
 parseOPBByteString :: BSLazy.ByteString -> Either String Formula
