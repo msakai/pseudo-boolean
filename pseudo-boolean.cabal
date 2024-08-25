@@ -57,7 +57,7 @@ library
      FlexibleContexts
      OverloadedStrings
   build-depends:
-     base >=4.12.0.0 && <4.20,
+     base >=4.12.0.0 && <4.21,
      containers >=0.6.0.1,
      parsec >=3.1.2 && <4,
      megaparsec >=7 && <10,
@@ -65,7 +65,7 @@ library
      dlist >=0.8.0.5 && <1.1.0,
      attoparsec >=0.13.2.2,
      deepseq >=1.4.4.0,
-     hashable >=1.2.7.0 && <1.5.0.0,
+     hashable >=1.2.7.0 && <1.6.0.0,
      void,
      OptDir >= 0.1.0,
      utf8-string >=1.0.1.1 && <1.1,
@@ -83,7 +83,7 @@ Test-suite TestPBFile
     bytestring,
     tasty >=0.10.1,
     tasty-hunit >=0.9 && <0.11,
-    tasty-quickcheck >=0.8 && <0.11,
+    tasty-quickcheck >=0.8 && <0.12,
     tasty-th,
     HUnit,
     QuickCheck >=2.5 && <3,
