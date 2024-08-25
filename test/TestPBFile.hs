@@ -48,10 +48,21 @@ case_invalid_lhs_empty_sum = checkOPBFile "test/samples/invalid-lhs-empty-sum.op
 case_invalid_lhs_empty_sum_wbo = checkWBOFile "test/samples/invalid-lhs-empty-sum.wbo"
 
 case_general_testlin_max_file  = checkOPBFile "test/samples/general/testlin-max.pb"
+
 case_general_relational_operator_file  = checkOPBFile "test/samples/general/test-relational-operator.pb"
 case_general_relational_operator_unicode_file  = checkOPBFile "test/samples/general/test-relational-operator-unicode.pb"
 case_general_relational_operator = checkOPBString "general relational operator" exampleGeneralRelationalOperator
 case_general_relational_operator_unicode = checkOPBString "general relational operator unicode" exampleGeneralRelationalOperatorUnicode
+
+case_general_enum_file = checkOPBFile "test/samples/general/test-enum.opb"
+case_general_enum_2_file = checkOPBFile "test/samples/general/test-enum-2.opb"
+case_general_enum_proj_file = checkOPBFile "test/samples/general/test-enum-proj.opb"
+case_general_enum_proj_2_file = checkOPBFile "test/samples/general/test-enum-proj-2.opb"
+
+case_general_count_file = checkOPBFile "test/samples/general/test-count.opb"
+case_general_count_2_file = checkOPBFile "test/samples/general/test-count-2.opb"
+case_general_count_proj_file = checkOPBFile "test/samples/general/test-count-proj.opb"
+case_general_count_proj_2_file = checkOPBFile "test/samples/general/test-count-proj-2.opb"
 
 case_general_relational_operator_unicode_equivalence = do
   Right expected <- parseOPBFile "test/samples/general/test-relational-operator.pb"

@@ -40,7 +40,7 @@ import Data.PseudoBoolean.Types
 
 -- | A ByteString Builder which renders a OPB format byte-string containing pseudo boolean problem.
 opbBuilder :: Formula -> Builder
-opbBuilder opb = (size <> part1 <> part2)
+opbBuilder opb = (size <> part1 <> part2 <> part3)
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
@@ -50,7 +50,20 @@ opbBuilder opb = (size <> part1 <> part2)
     size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
          <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
          <> char7 '\n'
-    part1 = 
+    part1 =
+      case pbModelCountingOrEnumeration opb of
+        Nothing -> mempty
+        Just (prob, mlits) ->
+          string7 "models: "
+          <> (case prob of
+                ModelCounting -> string7 "count"
+                ModelEnumeration -> string7 "enumerate")
+          <> string7 " ;\n"
+          <> (case mlits of
+                Nothing -> mempty
+                Just lits -> string7 "project: " <> foldr (\f g -> f <> char7 ' ' <> g) mempty (map showLit lits) <> string7 ";\n")
+
+    part2 =
       case pbObjectiveFunction opb of
         Nothing -> mempty
         Just (dir, o) ->
@@ -58,7 +71,7 @@ opbBuilder opb = (size <> part1 <> part2)
             OptMin -> string7 "min"
             OptMax -> string7 "max")
           <> string7 ": " <> showSum o <> string7 ";\n"
-    part2 = mconcat $ map showConstraint (pbConstraints opb)
+    part3 = mconcat $ map showConstraint (pbConstraints opb)
 
 -- | A ByteString Builder which renders a WBO format byte-string containing weighted boolean optimization problem.
 wboBuilder :: SoftFormula -> Builder
