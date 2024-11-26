@@ -23,6 +23,8 @@ module Data.PseudoBoolean
   (
   -- * Abstract Syntax
     Formula (..)
+  , ModelCountingOrEnumeration (..)
+  , Objective
   , Constraint
   , Op (..)
   , SoftFormula (..)
