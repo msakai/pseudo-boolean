@@ -1,4 +1,12 @@
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - 'v*'
+    tags:
+      - '*'
+  pull_request:
+
 name: build
 jobs:
   build:
