@@ -38,12 +38,12 @@ jobs:
           - ghc: '9.6.6'
             resolver: 'lts-22.43'
             coveralls: true
-            flags: '--coverage'
-          - ghc: '9.8.4'
-            resolver: 'lts-23.9'
             flags: ''
+          - ghc: '9.8.4'
+            resolver: 'lts-23.17'
+            flags: '--coverage'
           - ghc: '9.10.1'
-            resolver: 'nightly-2025-02-20'
+            resolver: 'nightly-2025-04-03'
             flags: ''
     steps:
       - uses: actions/checkout@v4
