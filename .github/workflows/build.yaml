@@ -1,4 +1,12 @@
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - 'v*'
+    tags:
+      - '*'
+  pull_request:
+
 name: build
 jobs:
   build:
@@ -15,7 +23,7 @@ jobs:
             resolver: 'lts-9.21'
             flags: ''
           - ghc: '8.2.2'
-            stack: 'latest'
+            stack: '2.15.5'
             resolver: 'lts-11.22'
             flags: ''
           - ghc: '8.4.4'
@@ -52,7 +60,7 @@ jobs:
             coveralls: true
             flags: '--coverage'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: haskell-actions/setup@v2
         name: Setup Haskell
@@ -61,16 +69,18 @@ jobs:
           enable-stack: true
           stack-version: ${{ matrix.stack }}
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         name: Cache ~/.stack
         with:
           path: ~/.stack
-          key: ${{ runner.os }}-${{ matrix.ghc }}-stack
+          key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('*.cabal') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.ghc }}-
 
       - name: Build
         run: |
-          echo "resolver: ${{ matrix.resolver }}" > stack.yaml
-          echo "system-ghc: true" >> stack.yaml
+          stack config set system-ghc --global true
+          sed -i "s/resolver: .*/resolver: ${{ matrix.resolver }}/" stack.yaml
           stack build --test --no-run-tests --bench --no-run-benchmarks ${{ matrix.flags }}
 
       - name: Test
