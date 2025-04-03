@@ -38,10 +38,10 @@ jobs:
           - ghc: '9.6.6'
             resolver: 'lts-22.43'
             coveralls: true
-            flags: '--coverage'
+            flags: ''
           - ghc: '9.8.4'
             resolver: 'lts-23.17'
-            flags: ''
+            flags: '--coverage'
           - ghc: '9.10.1'
             resolver: 'nightly-2025-04-03'
             flags: ''
