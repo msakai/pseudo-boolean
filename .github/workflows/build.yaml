@@ -15,7 +15,7 @@ jobs:
             resolver: 'lts-9.21'
             flags: ''
           - ghc: '8.2.2'
-            stack: 'latest'
+            stack: '2.15.5'
             resolver: 'lts-11.22'
             flags: ''
           - ghc: '8.4.4'
