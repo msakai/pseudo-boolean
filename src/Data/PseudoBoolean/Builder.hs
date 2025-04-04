@@ -38,10 +38,11 @@ opbBuilder opb = (size <> part1 <> part2)
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
+    neq = length [() | (_lhs, Eq, _rhs) <- pbConstraints opb]
     p = pbProducts opb
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
-    size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
+    size = fromString (printf "* #variable= %d #constraint= %d #equal= %d" nv nc neq)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
          <> fromString "\n"
     part1 = 
@@ -60,6 +61,7 @@ wboBuilder wbo = size <> part1 <> part2
   where
     nv = wboNumVars wbo
     nc = wboNumConstraints wbo
+    neq = length [() | (_, (_lhs, Eq, _rhs)) <- wboConstraints wbo]
     p = wboProducts wbo
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
@@ -69,7 +71,7 @@ wboBuilder wbo = size <> part1 <> part2
         cs -> minimum cs
     maxcost = maximum $ 0 : [c | (Just c, _) <- wboConstraints wbo]
     sumcost = Prelude.sum [c | (Just c, _) <- wboConstraints wbo]
-    size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
+    size = fromString (printf "* #variable= %d #constraint= %d #equal= %d" nv nc neq)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
          <> fromString (printf " #soft= %d" (wboNumSoft wbo))
          <> fromString (printf " mincost= %d maxcost= %d sumcost= %d" mincost maxcost sumcost)
