@@ -78,9 +78,9 @@ wboBuilder wbo = size <> part1 <> part2
     size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
          <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
          <> string7 " #soft= " <> intDec (wboNumSoft wbo)
-         <> string7 " #mincost= " <> integerDec mincost
-         <> string7 " #maxcost= " <> integerDec maxcost
-         <> string7 " #sumcost= " <> integerDec sumcost
+         <> string7 " mincost= " <> integerDec mincost
+         <> string7 " maxcost= " <> integerDec maxcost
+         <> string7 " sumcost= " <> integerDec sumcost
          <> char7 '\n'
     part1 = 
       case wboTopCost wbo of

@@ -72,7 +72,7 @@ wboBuilder wbo = size <> part1 <> part2
     size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
          <> fromString (printf " #soft= %d" (wboNumSoft wbo))
-         <> fromString (printf " #mincost= %d #maxcost= %d #sumcost= %d" mincost maxcost sumcost)
+         <> fromString (printf " mincost= %d maxcost= %d sumcost= %d" mincost maxcost sumcost)
          <> fromString "\n"
     part1 = 
       case wboTopCost wbo of
