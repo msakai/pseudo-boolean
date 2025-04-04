@@ -65,6 +65,7 @@ library
      attoparsec >=0.13.2.2,
      deepseq >=1.4.4.0,
      hashable >=1.2.7.0 && <1.6.0.0,
+     integer-logarithms >=1.0.3 && <1.1,
      void,
      OptDir >= 0.1.0,
      utf8-string >=1.0.1.1 && <1.1,
