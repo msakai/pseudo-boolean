@@ -1,3 +1,8 @@
+0.1.12.0
+-------
+* fix to to use correct hint name: `mincost=`, `maxcost=`, and `sumcost=` do not need `#`-prefix
+* generate `#equal=` hint and `intsize=` hint specified for PB24 competition
+
 0.1.11.0
 -------
 * some minor clean-up
