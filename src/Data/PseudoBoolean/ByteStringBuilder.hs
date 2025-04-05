@@ -32,10 +32,12 @@ import Prelude hiding (sum)
 import qualified Data.IntSet as IntSet
 import qualified Data.Set as Set
 import Data.List (sortBy)
+import Data.Maybe (maybeToList)
 import Data.Monoid hiding (Sum (..))
 import qualified Data.ByteString.Lazy as BS
 import Data.ByteString.Builder (Builder, intDec, integerDec, char7, string7, hPutBuilder, toLazyByteString)
 import Data.Ord
+import Math.NumberTheory.Logarithms (integerLog2)
 import System.IO
 import Data.PseudoBoolean.Types
 
@@ -45,10 +47,16 @@ opbBuilder opb = (size <> part1 <> part2)
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
+    neq = length [() | (_lhs, Eq, _rhs) <- pbConstraints opb]
+    intsize = maximum $ 0 :
+      [ if tmp == 0 then 0 else 1 + integerLog2 tmp
+      | (ts, d) <- [(ts, 0) | ts <- maybeToList (pbObjectiveFunction opb)] ++ [(lhs,rhs) | (lhs,_op,rhs) <- pbConstraints opb]
+      , let tmp = abs d + Prelude.sum [abs c | (c,_) <- ts]
+      ]
     p = pbProducts opb
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
-    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
+    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc <> string7 " #equal= " <> intDec neq <> string7 " intsize= " <> intDec intsize
          <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
          <> char7 '\n'
     part1 = 
@@ -63,6 +71,7 @@ wboBuilder wbo = size <> part1 <> part2
   where
     nv = wboNumVars wbo
     nc = wboNumConstraints wbo
+    neq = length [() | (_, (_lhs, Eq, _rhs)) <- wboConstraints wbo]
     p = wboProducts wbo
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
@@ -72,7 +81,12 @@ wboBuilder wbo = size <> part1 <> part2
         cs -> minimum cs
     maxcost = maximum $ 0 : [c | (Just c, _) <- wboConstraints wbo]
     sumcost = Prelude.sum [c | (Just c, _) <- wboConstraints wbo]
-    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc
+    intsize = maximum $ 0 :
+      [ if tmp == 0 then 0 else 1 + integerLog2 tmp
+      | (cs, d) <- ([sumcost], 0) : [(map fst lhs, rhs) | (_,(lhs,_op,rhs)) <- wboConstraints wbo]
+      , let tmp = abs d + Prelude.sum [abs c | c <- cs]
+      ]
+    size = string7 "* #variable= " <> intDec nv <> string7 " #constraint= " <> intDec nc <> string7 " #equal= " <> intDec neq <> string7 " intsize= " <> intDec intsize
          <> (if np >= 1 then string7 " #product= " <> intDec np <> string7 " sizeproduct= " <> intDec sp else mempty)
          <> string7 " #soft= " <> intDec (wboNumSoft wbo)
          <> string7 " mincost= " <> integerDec mincost

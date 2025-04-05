@@ -27,9 +27,11 @@ import qualified Data.DList as DList
 import qualified Data.IntSet as IntSet
 import qualified Data.Set as Set
 import Data.List (sortBy)
+import Data.Maybe (maybeToList)
 import Data.Monoid hiding (Sum (..))
 import Data.Ord
 import Data.String
+import Math.NumberTheory.Logarithms (integerLog2)
 import Text.Printf
 import Data.PseudoBoolean.Types
 
@@ -39,10 +41,16 @@ opbBuilder opb = (size <> part1 <> part2)
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
+    neq = length [() | (_lhs, Eq, _rhs) <- pbConstraints opb]
+    intsize = maximum $ 0 :
+      [ if tmp == 0 then 0 else 1 + integerLog2 tmp
+      | (ts, d) <- [(ts, 0) | ts <- maybeToList (pbObjectiveFunction opb)] ++ [(lhs,rhs) | (lhs,_op,rhs) <- pbConstraints opb]
+      , let tmp = abs d + Prelude.sum [abs c | (c,_) <- ts]
+      ]
     p = pbProducts opb
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
-    size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
+    size = fromString (printf "* #variable= %d #constraint= %d #equal= %d intsize= %d" nv nc neq intsize)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
          <> fromString "\n"
     part1 = 
@@ -57,6 +65,7 @@ wboBuilder wbo = size <> part1 <> part2
   where
     nv = wboNumVars wbo
     nc = wboNumConstraints wbo
+    neq = length [() | (_, (_lhs, Eq, _rhs)) <- wboConstraints wbo]
     p = wboProducts wbo
     np = Set.size p
     sp = Prelude.sum [IntSet.size tm | tm <- Set.toList p]
@@ -66,7 +75,12 @@ wboBuilder wbo = size <> part1 <> part2
         cs -> minimum cs
     maxcost = maximum $ 0 : [c | (Just c, _) <- wboConstraints wbo]
     sumcost = Prelude.sum [c | (Just c, _) <- wboConstraints wbo]
-    size = fromString (printf "* #variable= %d #constraint= %d" nv nc)
+    intsize = maximum $ 0 :
+      [ if tmp == 0 then 0 else 1 + integerLog2 tmp
+      | (cs, d) <- ([sumcost], 0) : [(map fst lhs, rhs) | (_,(lhs,_op,rhs)) <- wboConstraints wbo]
+      , let tmp = abs d + Prelude.sum [abs c | c <- cs]
+      ]
+    size = fromString (printf "* #variable= %d #constraint= %d #equal= %d intsize= %d" nv nc neq intsize)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
          <> fromString (printf " #soft= %d" (wboNumSoft wbo))
          <> fromString (printf " mincost= %d maxcost= %d sumcost= %d" mincost maxcost sumcost)
