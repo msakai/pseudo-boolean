@@ -36,7 +36,7 @@ import Data.PseudoBoolean.Types
 
 -- | A builder which renders a OPB format in any String-like 'Monoid'.
 opbBuilder :: (Monoid a, IsString a) => Formula -> a
-opbBuilder opb = (size <> part1 <> part2)
+opbBuilder opb = size <> part1 <> part2 <> part3
   where
     nv = pbNumVars opb
     nc = pbNumConstraints opb
@@ -52,7 +52,19 @@ opbBuilder opb = (size <> part1 <> part2)
     size = fromString (printf "* #variable= %d #constraint= %d #equal= %d intsize= %d" nv nc neq intsize)
          <> (if np >= 1 then fromString (printf " #product= %d sizeproduct= %d" np sp) else mempty)
          <> fromString "\n"
-    part1 = 
+    part1 =
+      case pbModelCountingOrEnumeration opb of
+        Nothing -> mempty
+        Just (prob, mlits) ->
+          fromString "models: "
+          <> (case prob of
+                ModelCounting -> fromString "count"
+                ModelEnumeration -> fromString "enumerate")
+          <> fromString " ;\n"
+          <> (case mlits of
+                Nothing -> mempty
+                Just lits -> fromString "project: " <> foldr (\f g -> f <> fromString " " <> g) mempty (map showLit lits) <> fromString ";\n")
+    part2 =
       case pbObjectiveFunction opb of
         Nothing -> mempty
         Just (dir, o) ->
@@ -60,7 +72,7 @@ opbBuilder opb = (size <> part1 <> part2)
             OptMin -> fromString "min"
             OptMax -> fromString "max")
           <> fromString ": " <> showSum o <> fromString ";\n"
-    part2 = mconcat $ map showConstraint (pbConstraints opb)
+    part3 = mconcat $ map showConstraint (pbConstraints opb)
 
 -- | A builder which renders a WBO format in any String-like 'Monoid'.
 wboBuilder :: (Monoid a, IsString a) => SoftFormula -> a
